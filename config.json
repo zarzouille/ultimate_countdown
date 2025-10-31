@@ -3,7 +3,7 @@
   "height": 200,
   "background_color": "#F5F5F5",
   "text_color": "#222222",
-  "font_path": "arial.ttf",
+  "font_path": "Roboto-VariableFont_wdth,wght.ttf",
   "font_size": 40,
   "message_prefix": "Temps restant : ",
   "target_date": "2025-11-10T23:59:59",
