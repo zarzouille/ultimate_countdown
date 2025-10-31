@@ -23,6 +23,7 @@ DEFAULT_CONFIG = {
 }
 
 CONFIG_PATH = "config.json"
+# Test auto-deploy Render
 
 def load_config():
     try:
