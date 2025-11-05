@@ -4,43 +4,43 @@
   <meta charset="UTF-8">
   <title>Configurer le Countdown</title>
   <style>
-    body { font-family: sans-serif; background: #fafafa; padding: 2rem; }
+    body {
+	    font-family: sans-serif;
+	    background: #fafafa;
+	    padding: 2rem;
+	    text-align: center;
+	    }
+    form {
+	    display: inline-block;
+	    text-align: left;
+	    background: white;
+	    padding: 1.5rem 2rem;
+	    border-radius: 10px;
+	    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+	    margin-bottom: 2rem;
+	    }
     label { display: block; margin-top: 1rem; }
     input[type="text"], input[type="color"], input[type="datetime-local"], input[type="number"] {
-	    padding: 6px; margin-top: 4px; width: 100%; max-width: 300px;
+	    padding: 6px;
+	    margin-top: 4px;
+	    width: 100%;
+	    max-width: 300px;
 	    }
     button {
-	    margin-top: 1.5rem; padding: 10px 20px; font-size: 16px;
-	    background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;
+	    margin-top: 1.5rem;
+	    padding: 10px 20px;
+	    font-size: 16px;
+	    background: #007bff;
+	    color: white;
+	    border: none;
+	    border-radius: 5px;
+	    cursor: pointer;
 	    }
     button:hover { background: #0056b3; }
-  </style>
-</head>
-<body>
-  <h2>🧩 Configuration du Countdown</h2>
-  <form method="POST">
-    <label>Date cible :
-      <input type="datetime-local" name="target_date"
-		      value="{{ config.target_date[:16].replace('T', ' ') }}">
-    </label>
-
-    <label>Couleur de fond :
-      <input type="color" name="background_color" value="{{ config.background_color }}">
-    </label>
-
-    <label>Couleur du texte :
-      <input type="color" name="text_color" value="{{ config.text_color }}">
-    </label>
-
-    <label>Taille du texte :
-      <input type="number" name="font_size" value="{{ config.font_size }}" min="10" max="200">
-    </label>
-
-    <label>Préfixe du message :
-      <input type="text" name="message_prefix" value="{{ config.message_prefix }}">
-    </label>
-
-    <button type="submit">💾 Valider</button>
-  </form>
-</body>
-</html>
+    .preview {
+	    margin-top: 2rem;
+	    padding: 1rem;
+	    background: #fff;
+	    border-radius: 10px;
+	    display: inline-block;
+	    box-shadow: 0 2px 8px rgba
