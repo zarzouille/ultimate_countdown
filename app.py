@@ -22,7 +22,7 @@ DEFAULT_CONFIG = {
     "loop_duration": 40
 }
 
-CONFIG_PATH = "config.json"
+CONFIG_PATH = os.path.join(os.path.dirname(__file__), "config.json")
 # Test auto-deploy Render
 
 def load_config():
