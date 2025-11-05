@@ -68,4 +68,4 @@ def countdown():
 
     # Calcul du temps restant
     days = delta.days
-    hours, rem = divmod(delta.seconds, 3600
+    hours, rem = divmod(delta.seconds, 3600)
