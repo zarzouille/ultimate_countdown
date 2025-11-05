@@ -62,7 +62,6 @@ def home():
 @app.route("/settings", methods=["GET", "POST"])
 def settings():
     global CONFIG
-
     if request.method == "POST":
         # Si la requête vient de JavaScript (application/json)
         if request.is_json:
@@ -76,8 +75,10 @@ def settings():
         CONFIG["font_size"] = int(data.get("font_size", CONFIG["font_size"]))
         CONFIG["message_prefix"] = data.get("message_prefix", CONFIG["message_prefix"])
 
+				print("✅ Nouvelle configuration :", CONFIG)
+
         save_config(CONFIG)
-        return ("", 204)  # Réponse vide mais succès
+        return  redirect(url_for("home"))  # Réponse vide mais succès
 
     return render_template("settings.html", config=CONFIG)
 
