@@ -26,19 +26,23 @@ CONFIG_PATH = "config.json"
 # Test auto-deploy Render
 
 def load_config():
-    try:
-        with open(CONFIG_PATH, "r", encoding="utf-8") as f:
-            cfg = json.load(f)
-        if not isinstance(cfg, dict):
-            raise ValueError
-        return {**DEFAULT_CONFIG, **cfg}
-    except (FileNotFoundError, JSONDecodeError, ValueError):
-        print("⚠️ Erreur config.json, utilisation de la config par défaut.", file=sys.stderr)
-        return DEFAULT_CONFIG.copy()
+    cfg = DEFAULT_CONFIG.copy()
+
+    # Lecture depuis les variables d'environnement
+    cfg["target_date"] = os.getenv("TARGET_DATE", cfg["target_date"])
+    cfg["background_color"] = os.getenv("BACKGROUND_COLOR", cfg["background_color"])
+    cfg["text_color"] = os.getenv("TEXT_COLOR", cfg["text_color"])
+    cfg["font_size"] = int(os.getenv("FONT_SIZE", cfg["font_size"]))
+    cfg["message_prefix"] = os.getenv("MESSAGE_PREFIX", cfg["message_prefix"])
+
+    return cfg
+
 
 def save_config(cfg):
-    with open(CONFIG_PATH, "w", encoding="utf-8") as f:
-        json.dump(cfg, f, indent=2, ensure_ascii=False)
+    """Ne rien faire ici sur Render (lecture seule), juste log."""
+    print("🟢 Nouvelle configuration (non enregistrée sur fichier) :")
+    print(json.dumps(cfg, indent=2, ensure_ascii=False))
+
 
 CONFIG = load_config()
 
@@ -64,9 +68,13 @@ def settings():
         CONFIG["text_color"] = request.form.get("text_color", CONFIG["text_color"])
         CONFIG["font_size"] = int(request.form.get("font_size", CONFIG["font_size"]))
         CONFIG["message_prefix"] = request.form.get("message_prefix", CONFIG["message_prefix"])
+
+        # Sur Render, on ne peut pas écrire dans un fichier, donc on log uniquement
         save_config(CONFIG)
         return redirect(url_for("home"))
+
     return render_template("settings.html", config=CONFIG)
+
 
 @app.route("/countdown.gif")
 def countdown_gif():
@@ -85,7 +93,7 @@ def countdown_gif():
         remaining = int((end_time - current_time).total_seconds())
 
         if remaining <= 0:
-            text = "⏰ Terminé !"
+            text = "⏰ La date est dépassée !"
         else:
             days, rem = divmod(remaining, 86400)
             hours, rem = divmod(rem, 3600)
