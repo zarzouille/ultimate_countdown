@@ -62,18 +62,25 @@ def home():
 @app.route("/settings", methods=["GET", "POST"])
 def settings():
     global CONFIG
-    if request.method == "POST":
-        CONFIG["target_date"] = request.form.get("target_date", CONFIG["target_date"])
-        CONFIG["background_color"] = request.form.get("background_color", CONFIG["background_color"])
-        CONFIG["text_color"] = request.form.get("text_color", CONFIG["text_color"])
-        CONFIG["font_size"] = int(request.form.get("font_size", CONFIG["font_size"]))
-        CONFIG["message_prefix"] = request.form.get("message_prefix", CONFIG["message_prefix"])
 
-        # Sur Render, on ne peut pas écrire dans un fichier, donc on log uniquement
+    if request.method == "POST":
+        # Si la requête vient de JavaScript (application/json)
+        if request.is_json:
+            data = request.get_json()
+        else:
+            data = request.form
+
+        CONFIG["target_date"] = data.get("target_date", CONFIG["target_date"])
+        CONFIG["background_color"] = data.get("background_color", CONFIG["background_color"])
+        CONFIG["text_color"] = data.get("text_color", CONFIG["text_color"])
+        CONFIG["font_size"] = int(data.get("font_size", CONFIG["font_size"]))
+        CONFIG["message_prefix"] = data.get("message_prefix", CONFIG["message_prefix"])
+
         save_config(CONFIG)
-        return redirect(url_for("home"))
+        return ("", 204)  # Réponse vide mais succès
 
     return render_template("settings.html", config=CONFIG)
+
 
 
 @app.route("/countdown.gif")
