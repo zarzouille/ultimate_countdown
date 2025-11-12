@@ -20,7 +20,7 @@ def load_config():
         "text_color": "#222222",
         "font_path": "/System/Library/Fonts/Supplemental/Arial.ttf",  # MacOS font par défaut
         "font_size": 40,
-        "message_prefix": "Temps restant : ",
+        "message_prefix": "Temps restante : ",
         "target_date": "2025-12-31T23:59:59",
         "loop_duration": 40
     }
