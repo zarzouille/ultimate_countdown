@@ -18,7 +18,7 @@ def load_config():
         "height": 200,
         "background_color": "#F5F5F5",
         "text_color": "#222222",
-        "font_path": "templates/DejaVuSans.ttf"
+        "font_path": "templates/DejaVuSans.ttf",
         "font_size": 40,
         "message_prefix": "Temps restante : ",
         "target_date": "2025-12-31T23:59:59",
