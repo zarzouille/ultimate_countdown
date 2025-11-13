@@ -1,125 +1,234 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <title>Mon compte à rebours</title>
-    <style>
-        body {
-	        font-family: "Inter", sans-serif;
-	        background-color: #f5f5f5;
-	        color: #333;
-	        display: flex;
-	        flex-direction: column;
-	        align-items: center;
-	        justify-content: flex-start;
-	        min-height: 100vh;
-	        margin: 0;
-	        padding: 30px;
-	        }
-        
-        h1 {
-	        font-size: 2em;
-	        margin-bottom: 20px;
-	        }
-        
-        form {
-	        background: white;
-	        padding: 20px;
-	        border-radius: 15px;
-	        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-	        width: 100%;
-	        max-width: 500px;
-	        margin-bottom: 30px;
-	        }
-        
-        label {
-	        display: block;
-	        margin-top: 15px;
-	        }
-        
-        input, button {
-	        width: 100%;
-	        padding: 8px;
-	        font-size: 1em;
-	        margin-top: 5px;
-	        border-radius: 8px;
-	        border: 1px solid #ccc;
-	        }
-        
-        button {
-	        margin-top: 20px;
-	        background-color: #007bff;
-	        color: white;
-	        border: none;
-	        cursor: pointer;
-	        }
-        
-        button:hover {
-	        background-color: #0056b3;
-	        }
-        
-        #preview {
-	        margin-top: 30px;
-	        text-align: center;
-	        }
-        
-        #preview img {
-	        border-radius: 12px;
-	        border: 2px solid #ccc;
-	        }
-    </style>
+  <meta charset="UTF-8">
+  <title>Configurer le compte à rebours</title>
+  <style>
+    body {
+	    font-family: Arial, sans-serif;
+	    background: #f5f5f5;
+	    color: #222;
+	    margin: 0;
+	    padding: 20px;
+	    display: flex;
+	    flex-direction: column;
+	    align-items: center;
+	    gap: 20px;
+	    }
+    
+    h1 { margin-bottom: 5px; }
+    
+    .container {
+	    display: flex;
+	    flex-direction: column;
+	    gap: 20px;
+	    width: 100%;
+	    max-width: 800px;
+	    }
+    
+    form {
+	    background: #ffffff;
+	    padding: 20px;
+	    border-radius: 12px;
+	    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+	    display: grid;
+	    grid-template-columns: 1fr 1fr;
+	    gap: 15px 20px;
+	    }
+    
+    label {
+	    font-size: 14px;
+	    display: block;
+	    margin-bottom: 4px;
+	    }
+    
+    input[type="text"],
+    input[type="datetime-local"],
+    input[type="color"],
+    input[type="number"] {
+	    width: 100%;
+	    padding: 6px;
+	    font-size: 14px;
+	    box-sizing: border-box;
+	    }
+    
+    .full-row {
+	    grid-column: 1 / 3;
+	    }
+    
+    button {
+	    grid-column: 1 / 3;
+	    padding: 10px 20px;
+	    font-size: 16px;
+	    background: #007bff;
+	    color: white;
+	    border: none;
+	    border-radius: 6px;
+	    cursor: pointer;
+	    }
+    
+    button:hover {
+	    background: #0056b3;
+	    }
+    
+    .preview-box {
+	    background: #fff;
+	    padding: 20px;
+	    border-radius: 12px;
+	    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+	    }
+    
+    #htmlPreview {
+	    width: 100%;
+	    max-width: 600px;
+	    height: 200px;
+	    margin: 0 auto;
+	    border-radius: 10px;
+	    display: flex;
+	    align-items: center;
+	    justify-content: center;
+	    font-weight: bold;
+	    }
+    
+    .link-box {
+	    background: #fff;
+	    padding: 20px;
+	    border-radius: 12px;
+	    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+	    }
+    
+    .link-input {
+	    width: 100%;
+	    padding: 8px;
+	    font-size: 14px;
+	    box-sizing: border-box;
+	    }
+    
+    .note {
+	    font-size: 13px;
+	    color: #555;
+	    }
+    
+    .small {
+	    font-size: 13px;
+	    color: #666;
+	    }
+  </style>
 </head>
 <body>
-    <h1>🎨 Personnaliser votre compte à rebours</h1>
+  <h1>🕒 Générateur de compte à rebours</h1>
+  <p class="small">Configure ton compte à rebours, puis utilise le lien généré dans tes emails.</p>
 
-    <form method="POST" action="/settings">
-    <label>Date cible :
-      <input type="datetime-local" name="target_date"
-		      value="{{ config.target_date.replace('T', ' ')[:16] }}">
-    </label>
+  <div class="container">
+    <!-- FORMULAIRE DE CONFIG -->
+    <form method="POST" id="configForm">
+      <div class="full-row">
+        <label for="target_date">Date cible :</label>
+        <input type="datetime-local" id="target_date" name="target_date"
+		        value="{{ target_date }}" required>
+      </div>
 
-    <label>Couleur de fond :
-      <input type="color" name="background_color" value="{{ config['background_color'] }}">
-    </label>
+      <div>
+        <label for="background_color">Couleur de fond :</label>
+        <input type="color" id="background_color" name="background_color"
+		        value="{{ config.background_color }}">
+      </div>
 
-    <label>Couleur du texte :
-      <input type="color" name="text_color" value="{{ config['text_color'] }}">
-    </label>
+      <div>
+        <label for="text_color">Couleur du texte :</label>
+        <input type="color" id="text_color" name="text_color"
+		        value="{{ config.text_color }}">
+      </div>
 
-    <label>Taille du texte :
-      <input type="number" name="font_size" value="{{ config['font_size'] }}" min="10" max="200">
-    </label>
+      <div>
+        <label for="font_size">Taille du texte (px) :</label>
+        <input type="number" id="font_size" name="font_size"
+		        value="{{ config.font_size }}" min="10" max="120">
+      </div>
 
-    <label>Préfixe du message :
-      <input type="text" name="message_prefix" value="{{ config['message_prefix'] }}">
-    </label>
-	    
-	    <!-- 🖼️ Aperçu dynamique du GIF -->
-    <div style="margin-top: 2rem; text-align: center;">
-      <p><strong>Aperçu du compte à rebours :</strong></p>
-      <img id="gifPreview" src="/countdown.gif?preview=1"
-		      alt="Aperçu du compte à rebours"
-		      width="400"
-		      style="border: 1px solid #ccc; border-radius: 8px; background: white; padding: 10px;">
+      <div>
+        <label for="message_prefix">Préfixe du message :</label>
+        <input type="text" id="message_prefix" name="message_prefix"
+		        value="{{ config.message_prefix }}">
+      </div>
+
+      <button type="submit">💾 Sauvegarder la configuration</button>
+    </form>
+	  
+	  <!-- PREVIEW HTML DYNAMIQUE -->
+    <div class="preview-box">
+      <h2>Aperçu en direct (HTML)</h2>
+      <div id="htmlPreview">
+        Chargement…
+      </div>
+      <p class="small">Cet aperçu imite le futur GIF, mais en HTML. Le GIF final sera généré par l’URL ci-dessous.</p>
     </div>
+	  
+	  <!-- LIEN À COPIER -->
+    <div class="link-box">
+      <h2>Lien de l'image dynamique</h2>
+      <p class="note">
+        Utilise ce lien dans la balise <code>&lt;img&gt;</code> de ton email, par exemple :<br>
+        <code>&lt;img src="{{ img_link }}" alt="Countdown"&gt;</code>
+      </p>
+      <input type="text" class="link-input" readonly value="{{ img_link }}" id="imgLinkInput">
+    </div>
+  </div>
 
-    <button type="submit">💾 Valider & Télécharger le GIF</button>
-</form>
-
-    <script>
-    const form = document.querySelector("form");
+  <script>
+    const targetInput = document.getElementById("target_date");
+    const bgInput = document.getElementById("background_color");
+    const txtInput = document.getElementById("text_color");
+    const sizeInput = document.getElementById("font_size");
+    const prefixInput = document.getElementById("message_prefix");
+    const previewBox = document.getElementById("htmlPreview");
     
-    form.addEventListener("input", () => {
-	    const bg = document.querySelector("[name='background_color']").value;
-	    const txt = document.querySelector("[name='text_color']").value;
-	    const size = document.querySelector("[name='font_size']").value;
-	    const prefix = document.querySelector("[name='message_prefix']").value;
+    function updatePreview() {
+	    const bg = bgInput.value || "#ffffff";
+	    const txt = txtInput.value || "#000000";
+	    const size = parseInt(sizeInput.value || "40", 10);
+	    const prefix = prefixInput.value || "Temps restant : ";
+	    const targetVal = targetInput.value;
 	    
-	    document.getElementById("gifPreview").src =
-			    `/countdown.gif?preview=1&bg=${bg}&txt=${txt}&size=${size}&prefix=${encodeURIComponent(prefix)}&` + Date.now();
-    });
-</script>
-
-
+	    previewBox.style.backgroundColor = bg;
+	    previewBox.style.color = txt;
+	    previewBox.style.fontSize = size + "px";
+	    
+	    if (!targetVal) {
+		    previewBox.textContent = "Choisis une date pour voir l’aperçu.";
+		    return;
+	    }
+	    
+	    const targetDate = new Date(targetVal);
+	    if (isNaN(targetDate.getTime())) {
+		    previewBox.textContent = "Date invalide";
+		    return;
+	    }
+	    
+	    const now = new Date();
+	    const diff = targetDate - now;
+	    if (diff <= 0) {
+		    previewBox.textContent = "⏰ Terminé !";
+		    return;
+	    }
+	    
+	    const totalSeconds = Math.floor(diff / 1000);
+	    const days = Math.floor(totalSeconds / 86400);
+	    const hours = Math.floor((totalSeconds % 86400) / 3600);
+	    const minutes = Math.floor((totalSeconds % 3600) / 60);
+	    const seconds = totalSeconds % 60;
+	    
+	    previewBox.textContent = `${prefix}${days}j ${String(hours).padStart(2,"0")}:${String(minutes).padStart(2,"0")}:${String(seconds).padStart(2,"0")}`;
+    }
+    
+    // Mise à jour en continu toutes les secondes
+    setInterval(updatePreview, 1000);
+    
+    // Mise à jour à chaque changement de champ
+    document.getElementById("configForm").addEventListener("input", updatePreview);
+    
+    // Premier calcul à l’ouverture
+    updatePreview();
+  </script>
 </body>
 </html>
