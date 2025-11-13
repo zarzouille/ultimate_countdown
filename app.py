@@ -64,14 +64,16 @@ def settings():
     return render_template("settings.html", config=CONFIG)
 
 # ============================
-# GÉNÉRATION DU GIF
+# GÉNÉRATION DU GIF (APERÇU + DÉFINITIF)
 # ============================
 @app.route("/countdown.gif")
 def countdown_gif():
     cfg = load_config()
-    # Mode preview dynamique (aperçu live)
+
+    # ----- MODE PREVIEW (aperçu dynamique) -----
     if "preview" in request.args:
-        # couleurs et taille modifiées en direct
+
+        # Mise à jour live des paramètres
         cfg["background_color"] = request.args.get("bg", cfg["background_color"])
         cfg["text_color"] = request.args.get("txt", cfg["text_color"])
         try:
@@ -79,19 +81,19 @@ def countdown_gif():
         except:
             pass
 
-        # date factice pour l’aperçu (sinon “Terminé”)
-        fake_seconds = (datetime.utcnow().second * 7) % 86400
-        days, rem = divmod(fake_seconds, 86400)
+        # Génération d'un faux compte à rebours vivant
+        pseudo = (datetime.utcnow().second * 17) % 200000
+        days, rem = divmod(pseudo, 86400)
         hours, rem = divmod(rem, 3600)
         minutes, seconds = divmod(rem, 60)
-        cfg["preview_text"] = f"{cfg['message_prefix']}{days}j {hours:02}:{minutes:02}:{seconds:02}"
+        preview_text = f"{cfg['message_prefix']}{days}j {hours:02}:{minutes:02}:{seconds:02}"
 
     loop_duration = cfg.get("loop_duration", 10)
 
-    # Mode aperçu (ne dépend pas de la vraie date)
+    # ----- DÉTERMINATION DE LA DATE -----
     if "preview" in request.args:
         now = datetime.utcnow()
-        end_time = now + timedelta(days=3, hours=12, minutes=45, seconds=30)
+        end_time = now + timedelta(days=3)
     else:
         try:
             end_time = datetime.fromisoformat(cfg["target_date"])
@@ -99,18 +101,25 @@ def countdown_gif():
             return "Date invalide dans config.json", 400
         now = datetime.utcnow()
 
+    # ----- GÉNÉRATION DES FRAMES -----
     frames = []
     for i in range(loop_duration):
         current_time = now + timedelta(seconds=i)
         remaining = int((end_time - current_time).total_seconds())
 
-        if remaining <= 0:
-            if "preview" in request.args:
-                text = cfg["preview_text"]
-            else:
+        # ===== LOGIQUE TEXTE =====
+        if "preview" in request.args:
+            text = preview_text
+        else:
+            if remaining <= 0:
                 text = "⏰ Terminé !"
+            else:
+                days, rem = divmod(remaining, 86400)
+                hours, rem = divmod(rem, 3600)
+                minutes, seconds = divmod(rem, 60)
+                text = f"{cfg['message_prefix']}{days}j {hours:02}:{minutes:02}:{seconds:02}"
 
-
+        # ===== DESSIN =====
         img = Image.new("RGB", (cfg["width"], cfg["height"]), cfg["background_color"])
         draw = ImageDraw.Draw(img)
 
@@ -128,6 +137,7 @@ def countdown_gif():
 
         frames.append(img)
 
+    # ----- EXPORT GIF -----
     buf = BytesIO()
     frames[0].save(
         buf, format="GIF",
@@ -138,14 +148,13 @@ def countdown_gif():
     return send_file(buf, mimetype="image/gif")
 
 # ============================
-# TÉLÉCHARGEMENT DU GIF
+# TÉLÉCHARGEMENT DU GIF FINAL
 # ============================
 @app.route("/download")
 def download_gif():
-    """Génère le GIF et le renvoie en téléchargement"""
     cfg = load_config()
     try:
-        end_time = datetime.fromisoformat(cfg["target_date"])
+        end_time = datetime.fromisoformat(cfg["target_date"].replace(" ", "T"))
     except ValueError:
         return "Date invalide", 400
 
