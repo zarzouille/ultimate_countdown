@@ -3,61 +3,70 @@
 <head>
   <meta charset="UTF-8">
   <title>Modifier le design</title>
-  <style>
-    body {
-	    font-family: Arial, sans-serif;
-	    background-color: {{ config.background_color }};
-	    color: {{ config.font_color }};
-	    text-align: center;
-	    padding: 30px;
-	    }
-    
-    form {
-	    background: rgba(255, 255, 255, 0.05);
-	    padding: 25px;
-	    border-radius: 12px;
-	    display: inline-block;
-	    text-align: left;
-	    margin-bottom: 30px;
-	    }
-    
-    label {
-	    display: block;
-	    margin-top: 10px;
-	    font-size: 14px;
-	    }
-    
-    input, select {
-	    margin-top: 5px;
-	    padding: 8px;
-	    width: 100%;
-	    font-size: 14px;
-	    }
-    
-    button {
-	    margin-top: 20px;
-	    padding: 10px 20px;
-	    font-size: 16px;
-	    border: none;
-	    border-radius: 8px;
-	    cursor: pointer;
-	    background-color: #4CAF50;
-	    color: white;
-	    }
-    
-    button:hover {
-	    background-color: #45a049;
-	    }
-    
-    #preview {
-	    padding: 40px;
-	    border-radius: 12px;
-	    margin-top: 20px;
-	    display: inline-block;
-	    min-width: 300px;
-	    font-weight: bold;
-	    }
-  </style>
+ <style>
+  :root {
+	  color-scheme: light !important; /* Désactive le dark mode forcé sur Brave */
+	  }
+  
+  body {
+	  font-family: Arial, sans-serif;
+	  background-color: #ffffff !important;
+	  color: #222222 !important;
+	  text-align: center;
+	  padding: 30px;
+	  margin: 0;
+	  }
+  
+  form {
+	  background: #f7f7f7;
+	  padding: 25px;
+	  border-radius: 12px;
+	  display: inline-block;
+	  text-align: left;
+	  margin-bottom: 30px;
+	  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+	  }
+  
+  label {
+	  display: block;
+	  margin-top: 10px;
+	  font-size: 14px;
+	  color: #333;
+	  }
+  
+  input, select {
+	  margin-top: 5px;
+	  padding: 8px;
+	  width: 100%;
+	  font-size: 15px;
+	  }
+  
+  button {
+	  margin-top: 20px;
+	  padding: 10px 20px;
+	  font-size: 16px;
+	  border: none;
+	  border-radius: 8px;
+	  cursor: pointer;
+	  background-color: #4CAF50;
+	  color: white;
+	  }
+  
+  button:hover {
+	  background-color: #45a049;
+	  }
+  
+  #preview {
+	  padding: 40px;
+	  border-radius: 12px;
+	  margin-top: 20px;
+	  display: inline-block;
+	  min-width: 300px;
+	  font-weight: bold;
+	  background-color: #f5f5f5;
+	  }
+</style>
+
 </head>
 <body>
   <h1>Modifier le design</h1>
