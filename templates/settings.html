@@ -72,7 +72,7 @@
 <body>
     <h1>🎨 Personnaliser votre compte à rebours</h1>
 
-    <form method="POST">
+    <form method="POST" action="/settings">
     <label>Date cible :
       <input type="datetime-local" name="target_date"
 		      value="{{ config.target_date.replace('T', ' ')[:16] }}">
@@ -105,15 +105,6 @@
 
     <button type="submit">💾 Valider & Télécharger le GIF</button>
 </form>
-
-    <div id="preview">
-        <h2>Aperçu en direct</h2>
-        <img id="gifPreview" src="/countdown.gif?preview=1" alt="Aperçu du compte à rebours" width="400">
-        <br><br>
-        <a id="downloadBtn" href="/countdown.gif" download="countdown.gif">
-            ⬇️ Télécharger le GIF
-        </a>
-    </div>
 
     <script>
     const form = document.querySelector("form");
