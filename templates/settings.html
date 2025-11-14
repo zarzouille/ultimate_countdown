@@ -4,176 +4,441 @@
   <meta charset="UTF-8">
   <title>Créer un compte à rebours</title>
   <style>
+    :root {
+	    --bg: #0f172a;
+	    --bg-elevated: #020617;
+	    --card: #020617;
+	    --card-soft: #020617;
+	    --border-subtle: #1e293b;
+	    --accent: #6366f1;
+	    --accent-soft: #4f46e5;
+	    --accent-soft-bg: rgba(99,102,241,0.08);
+	    --text-main: #e5e7eb;
+	    --text-soft: #9ca3af;
+	    --text-soft2: #6b7280;
+	    --danger: #ef4444;
+	    --radius-lg: 16px;
+	    --radius-md: 10px;
+	    --shadow-soft: 0 18px 45px rgba(15,23,42,0.55);
+	    }
+    
+    * {
+	    box-sizing: border-box;
+	    }
+    
     body {
-	    font-family: Arial, sans-serif;
-	    background: #f5f5f5;
 	    margin: 0;
-	    padding: 20px;
+	    min-height: 100vh;
+	    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+	    background: radial-gradient(circle at top left, #1e293b 0, #020617 35%, #020617 100%);
+	    color: var(--text-main);
+	    padding: 24px;
 	    display: flex;
 	    flex-direction: column;
-	    align-items: center;
-	    gap: 20px;
+	    align-items: stretch;
 	    }
     
-    h1 {
-	    margin-bottom: 4px;
+    a {
+	    color: var(--accent);
+	    text-decoration: none;
 	    }
     
-    .small {
-	    font-size: 13px;
-	    color: #666;
+    a:hover {
+	    text-decoration: underline;
 	    }
     
-    .container {
+    .page-wrapper {
+	    max-width: 1280px;
 	    width: 100%;
-	    max-width: 1100px;
+	    margin: 0 auto;
+	    }
+    
+    /* ==== HEADER ==== */
+    .header {
+	    display: flex;
+	    align-items: center;
+	    justify-content: space-between;
+	    margin-bottom: 24px;
+	    gap: 16px;
+	    }
+    
+    .header-left {
 	    display: flex;
 	    flex-direction: column;
-	    gap: 25px;
+	    gap: 4px;
 	    }
     
-    .card {
-	    background: #ffffff;
-	    padding: 20px;
-	    border-radius: 12px;
-	    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+    .title-row {
+	    display: flex;
+	    align-items: center;
+	    gap: 10px;
+	    font-size: 22px;
+	    font-weight: 600;
 	    }
     
-    .card h2 {
-	    margin-top: 0;
-	    font-size: 18px;
-	    margin-bottom: 10px;
+    .pill {
+	    font-size: 11px;
+	    text-transform: uppercase;
+	    letter-spacing: 0.1em;
+	    padding: 4px 10px;
+	    border-radius: 999px;
+	    background: rgba(15,23,42,0.9);
+	    color: var(--text-soft);
+	    border: 1px solid rgba(148,163,184,0.3);
 	    }
     
-    form {
+    .subtitle {
+	    font-size: 13px;
+	    color: var(--text-soft);
+	    }
+    
+    .header-actions {
+	    display: flex;
+	    align-items: center;
+	    gap: 8px;
+	    }
+    
+    .btn-ghost {
+	    padding: 7px 12px;
+	    border-radius: 999px;
+	    border: 1px solid rgba(148,163,184,0.5);
+	    background: transparent;
+	    color: var(--text-soft);
+	    font-size: 13px;
+	    display: inline-flex;
+	    align-items: center;
+	    gap: 6px;
+	    cursor: pointer;
+	    }
+    
+    .btn-ghost:hover {
+	    border-color: var(--accent);
+	    color: #e5e7eb;
+	    }
+    
+    .btn-ghost span.icon {
+	    font-size: 14px;
+	    }
+    
+    /* ==== LAYOUT ==== */
+    .layout {
 	    display: grid;
-	    grid-template-columns: repeat(3, minmax(0,1fr));
-	    gap: 15px 20px;
+	    grid-template-columns: minmax(0, 2.3fr) minmax(0, 1.7fr);
+	    gap: 20px;
+	    align-items: flex-start;
+	    }
+    
+    @media (max-width: 960px) {
+	    .layout {
+		    grid-template-columns: minmax(0, 1fr);
+		    }
+	    }
+    
+    /* ==== CARDS ==== */
+    .card {
+	    background: radial-gradient(circle at top left, #0b1120 0, #020617 40%, #020617 100%);
+	    border-radius: var(--radius-lg);
+	    border: 1px solid var(--border-subtle);
+	    box-shadow: var(--shadow-soft);
+	    padding: 18px 18px 18px;
+	    }
+    
+    .card-header {
+	    display: flex;
+	    align-items: center;
+	    justify-content: space-between;
+	    margin-bottom: 14px;
+	    gap: 8px;
+	    }
+    
+    .card-title {
+	    font-size: 15px;
+	    font-weight: 600;
+	    display: flex;
+	    align-items: center;
+	    gap: 8px;
+	    }
+    
+    .card-title-icon {
+	    width: 22px;
+	    height: 22px;
+	    border-radius: 999px;
+	    display: flex;
+	    align-items: center;
+	    justify-content: center;
+	    background: var(--accent-soft-bg);
+	    font-size: 13px;
+	    }
+    
+    .card-subtitle {
+	    font-size: 12px;
+	    color: var(--text-soft2);
+	    }
+    
+    /* ==== FORM ==== */
+    form#configForm {
+	    display: grid;
+	    grid-template-columns: repeat(2, minmax(0, 1fr));
+	    gap: 14px 14px;
+	    }
+    
+    .form-group {
+	    display: flex;
+	    flex-direction: column;
+	    gap: 4px;
+	    }
+    
+    .form-group.full {
+	    grid-column: 1 / 3;
 	    }
     
     label {
-	    font-size: 13px;
-	    margin-bottom: 4px;
-	    display: block;
+	    font-size: 12px;
+	    color: var(--text-soft);
+	    display: flex;
+	    align-items: center;
+	    justify-content: space-between;
+	    }
+    
+    label span.hint {
+	    font-size: 11px;
+	    color: var(--text-soft2);
 	    }
     
     input[type="text"],
     input[type="datetime-local"],
-    input[type="color"],
     input[type="number"],
     select {
+	    background: rgba(15,23,42,0.9);
+	    border-radius: var(--radius-md);
+	    border: 1px solid rgba(55,65,81,0.9);
+	    color: var(--text-main);
+	    padding: 7px 9px;
+	    font-size: 13px;
+	    outline: none;
+	    transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+	    }
+    
+    input[type="text"]:focus,
+    input[type="datetime-local"]:focus,
+    input[type="number"]:focus,
+    select:focus {
+	    border-color: var(--accent);
+	    box-shadow: 0 0 0 1px rgba(129,140,248,0.45);
+	    background: rgba(15,23,42,1);
+	    }
+    
+    input[type="color"] {
 	    width: 100%;
-	    padding: 6px;
-	    font-size: 14px;
-	    box-sizing: border-box;
-	    }
-    
-    .full-row {
-	    grid-column: 1 / 4;
-	    }
-    
-    .section-title {
-	    grid-column: 1 / 4;
-	    margin-top: 10px;
-	    font-weight: bold;
-	    font-size: 14px;
-	    border-bottom: 1px solid #eee;
-	    padding-bottom: 4px;
-	    }
-    
-    .checkbox-row {
-	    display: flex;
-	    align-items: center;
-	    gap: 6px;
-	    margin-top: 4px;
-	    }
-    
-    button {
-	    grid-column: 1 / 4;
-	    padding: 12px;
-	    font-size: 16px;
-	    background: #007bff;
-	    color: #fff;
-	    border: none;
-	    border-radius: 6px;
+	    height: 32px;
+	    border-radius: var(--radius-md);
+	    padding: 0;
+	    border: 1px solid rgba(55,65,81,0.9);
+	    background: transparent;
 	    cursor: pointer;
 	    }
     
-    button:hover {
-	    background: #0056b3;
+    .inline-checkbox {
+	    display: flex;
+	    align-items: center;
+	    gap: 6px;
+	    font-size: 12px;
+	    color: var(--text-soft);
+	    }
+    
+    .inline-row {
+	    display: flex;
+	    gap: 8px;
+	    align-items: center;
+	    }
+    
+    input[type="checkbox"] {
+	    accent-color: var(--accent);
+	    cursor: pointer;
+	    }
+    
+    input[type="range"] {
+	    width: 100%;
+	    }
+    
+    .range-row {
+	    display: flex;
+	    align-items: center;
+	    gap: 8px;
+	    }
+    
+    .range-value {
+	    font-size: 12px;
+	    color: var(--text-soft);
+	    min-width: 40px;
+	    text-align: right;
+	    }
+    
+    /* ==== BUTTON ==== */
+    .btn-primary {
+	    grid-column: 1 / 3;
+	    margin-top: 6px;
+	    border: none;
+	    border-radius: 999px;
+	    background: linear-gradient(135deg, #4f46e5, #7c3aed);
+	    color: white;
+	    font-size: 14px;
+	    font-weight: 500;
+	    padding: 10px 16px;
+	    cursor: pointer;
+	    display: inline-flex;
+	    align-items: center;
+	    justify-content: center;
+	    gap: 8px;
+	    box-shadow: 0 18px 40px rgba(79,70,229,0.4);
+	    }
+    
+    .btn-primary:hover {
+	    filter: brightness(1.05);
+	    }
+    
+    /* ==== TAGS / BADGES ==== */
+    .template-badges {
+	    display: flex;
+	    flex-wrap: wrap;
+	    gap: 6px;
+	    margin-top: 6px;
+	    }
+    
+    .badge-template {
+	    font-size: 11px;
+	    padding: 4px 8px;
+	    border-radius: 999px;
+	    border: 1px solid rgba(148,163,184,0.5);
+	    color: var(--text-soft);
+	    background: rgba(15,23,42,0.9);
+	    }
+    
+    /* ==== PREVIEW ==== */
+    .preview-wrapper {
+	    display: flex;
+	    flex-direction: column;
+	    gap: 14px;
 	    }
     
     #htmlPreview {
 	    width: 100%;
-	    max-width: 700px;
-	    height: 200px;
-	    border-radius: 12px;
+	    max-width: 100%;
+	    height: 220px;
+	    border-radius: var(--radius-lg);
+	    border: 1px solid rgba(148,163,184,0.35);
+	    background: radial-gradient(circle at top left, #020617 0, #020617 40%, #020617 100%);
 	    display: flex;
 	    align-items: center;
 	    justify-content: center;
-	    font-weight: bold;
-	    margin: 0 auto;
-	    text-align: center;
+	    font-weight: 600;
+	    font-size: 18px;
 	    padding: 10px;
-	    box-sizing: border-box;
+	    text-align: center;
+	    box-shadow: 0 18px 45px rgba(15,23,42,0.75);
 	    }
     
     .link-input {
 	    width: 100%;
-	    font-size: 14px;
-	    padding: 7px;
-	    box-sizing: border-box;
+	    padding: 7px 10px;
+	    border-radius: var(--radius-md);
+	    border: 1px solid rgba(55,65,81,0.9);
+	    background: rgba(15,23,42,0.9);
+	    color: var(--text-main);
+	    font-size: 13px;
 	    }
     
-    .code {
-	    background: #eee;
-	    padding: 8px;
-	    border-radius: 6px;
-	    font-family: monospace;
-	    font-size: 13px;
-	    margin-top: 6px;
+    .code-block {
+	    border-radius: var(--radius-md);
+	    background: rgba(15,23,42,0.9);
+	    border: 1px solid rgba(55,65,81,0.9);
+	    padding: 10px;
+	    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+	    font-size: 12px;
+	    color: var(--text-soft);
 	    overflow-x: auto;
+	    }
+    
+    .helper-text {
+	    font-size: 11px;
+	    color: var(--text-soft2);
+	    margin-top: 4px;
+	    }
+    
+    .badge-small {
+	    display: inline-flex;
+	    align-items: center;
+	    gap: 4px;
+	    font-size: 11px;
+	    background: rgba(15,23,42,0.9);
+	    border-radius: 999px;
+	    padding: 3px 8px;
+	    border: 1px solid rgba(148,163,184,0.4);
+	    color: var(--text-soft);
 	    }
 
   </style>
 </head>
 <body>
 
-  <h1>🕒 Créer un nouveau compte à rebours</h1>
-  <p class="small">
-    Chaque sauvegarde génère un ID unique et un GIF permanent.
-    Pour gérer tous les countdowns : <a href="/admin" target="_blank">Admin</a>
-  </p>
+<div class="page-wrapper">
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header-left">
+      <div class="title-row">
+        <span>🕒 Countdown Studio</span>
+        <span class="pill">Multi-templates • Email ready</span>
+      </div>
+      <div class="subtitle">
+        Configure ton compte à rebours, visualise le rendu en live, puis récupère un lien GIF dynamique prêt à intégrer dans tes emails.
+      </div>
+    </div>
+    <div class="header-actions">
+      <a href="/admin" class="btn-ghost"><span class="icon">🔐</span>Admin</a>
+      <a href="/list" class="btn-ghost"><span class="icon">📋</span>Liste</a>
+    </div>
+  </header>
+	
+	<!-- LAYOUT 2 COLONNES -->
+  <div class="layout">
 
-  <div class="container">
-
-    <!-- FORMULAIRE PRINCIPAL -->
+    <!-- COLONNE GAUCHE : FORM -->
     <div class="card">
-      <h2>Configuration</h2>
+      <div class="card-header">
+        <div>
+          <div class="card-title">
+            <div class="card-title-icon">🎛</div>
+            Configurer un nouveau countdown
+          </div>
+          <div class="card-subtitle">
+            Tous les paramètres sont enregistrés dans un ID unique. Chaque création génère un GIF indépendant.
+          </div>
+        </div>
+      </div>
 
       <form method="POST" id="configForm">
-        <div class="section-title">Général</div>
 
-        <div class="full-row">
-          <label>Date cible :</label>
+        <!-- SECTION GÉNÉRALE -->
+        <div class="form-group full">
+          <label>Date cible <span class="hint">Obligatoire</span></label>
           <input type="datetime-local" name="target_date" id="target_date" value="{{ target_date }}" required>
         </div>
 
-        <div>
-          <label>Template :</label>
+        <div class="form-group">
+          <label>Template <span class="hint">Style global</span></label>
           <select name="template" id="template">
-            <option value="classic"  {% if config.template == 'classic'  %}selected{% endif %}>Classique</option>
-	          <option value="blocks"   {% if config.template == 'blocks'   %}selected{% endif %}>Blocs</option>
-	          <option value="flip"     {% if config.template == 'flip'     %}selected{% endif %}>Flip</option>
-	          <option value="bubble"   {% if config.template == 'bubble'   %}selected{% endif %}>Bulles</option>
+            <option value="classic"  {% if config.template == 'classic'  %}selected{% endif %}>Classic</option>
+	          <option value="blocks"   {% if config.template == 'blocks'   %}selected{% endif %}>Blocks</option>
+	          <option value="flip"     {% if config.template == 'flip'     %}selected{% endif %}>Flip clock</option>
+	          <option value="bubble"   {% if config.template == 'bubble'   %}selected{% endif %}>Bubble</option>
 	          <option value="minimal"  {% if config.template == 'minimal'  %}selected{% endif %}>Minimal</option>
-	          <option value="banner"   {% if config.template == 'banner'   %}selected{% endif %}>Bannière</option>
-	          <option value="progress" {% if config.template == 'progress' %}selected{% endif %}>Barre de progression</option>
+	          <option value="banner"   {% if config.template == 'banner'   %}selected{% endif %}>Banner</option>
+	          <option value="progress" {% if config.template == 'progress' %}selected{% endif %}>Progress bar</option>
           </select>
         </div>
 
-        <div>
-          <label>Alignement :</label>
+        <div class="form-group">
+          <label>Alignement</label>
           <select name="alignment" id="alignment">
             <option value="left"   {% if config.alignment == 'left'   %}selected{% endif %}>Gauche</option>
 	          <option value="center" {% if config.alignment == 'center' %}selected{% endif %}>Centré</option>
@@ -181,302 +446,358 @@
           </select>
         </div>
 
-        <div>
-          <label>Padding (px) :</label>
-          <input type="number" name="padding" id="padding" value="{{ config.padding }}" min="0" max="100">
-        </div>
-
-        <div class="section-title">Couleurs & police</div>
-
-        <div>
-          <label>Couleur de fond :</label>
+        <div class="form-group">
+          <label>Couleur de fond</label>
           <input type="color" name="background_color" id="background_color" value="{{ config.background_color }}">
         </div>
 
-        <div>
-          <label>Couleur du texte :</label>
+        <div class="form-group">
+          <label>Couleur du texte</label>
           <input type="color" name="text_color" id="text_color" value="{{ config.text_color }}">
         </div>
 
-        <div>
-          <label>Taille du texte (px) :</label>
-          <input type="number" name="font_size" id="font_size" value="{{ config.font_size }}" min="10" max="150">
+        <div class="form-group">
+          <label>Taille du texte</label>
+          <div class="range-row">
+            <input type="range" min="10" max="120" name="font_size" id="font_size" value="{{ config.font_size }}">
+            <div class="range-value"><span id="fontSizeValue">{{ config.font_size }}</span> px</div>
+          </div>
         </div>
 
-        <div class="full-row">
-          <label>Préfixe du message :</label>
+        <div class="form-group full">
+          <label>Préfixe du message <span class="hint">Ex : “Temps restant : ”</span></label>
           <input type="text" name="message_prefix" id="message_prefix" value="{{ config.message_prefix }}">
         </div>
-
-        <div class="section-title">Icône</div>
-
-        <div>
-          <label>Icône (ex: ⏳ 🔥 🎉) :</label>
-          <input type="text" name="icon" id="icon" value="{{ config.icon }}">
+	      
+	      <!-- SECTION ICÔNE -->
+        <div class="form-group">
+          <label>Icône</label>
+          <input type="text" name="icon" id="icon" value="{{ config.icon }}" placeholder="ex : ⏳, 🔥, 🎉">
         </div>
 
-        <div>
-          <label>Position de l’icône :</label>
+        <div class="form-group">
+          <label>Position de l’icône</label>
           <select name="icon_position" id="icon_position">
             <option value="left"   {% if config.icon_position == 'left'   %}selected{% endif %}>Avant le texte</option>
 	          <option value="right"  {% if config.icon_position == 'right'  %}selected{% endif %}>Après le texte</option>
 	          <option value="above"  {% if config.icon_position == 'above'  %}selected{% endif %}>Au-dessus</option>
           </select>
         </div>
+	      
+	      <!-- SECTION PADDING -->
+        <div class="form-group">
+          <label>Padding (px)</label>
+          <input type="number" name="padding" id="padding" value="{{ config.padding }}" min="0" max="100">
+        </div>
+	      
+	      <!-- BLOCS -->
+        <div class="form-group full">
+          <label>Blocs (Blocks / Flip / Bubble)</label>
+          <div class="template-badges">
+            <span class="badge-template">Fond, contour, arrondis, espacements…</span>
+          </div>
+        </div>
 
-        <div></div>
-
-        <div class="section-title">Blocs (templates : Blocs / Flip / Bulles)</div>
-
-        <div>
-          <label>Fond des blocs :</label>
+        <div class="form-group">
+          <label>Fond blocs</label>
           <input type="color" name="block_bg_color" id="block_bg_color" value="{{ config.block_bg_color }}">
         </div>
 
-        <div>
-          <label>Contour des blocs :</label>
+        <div class="form-group">
+          <label>Contour blocs</label>
           <input type="color" name="block_border_color" id="block_border_color" value="{{ config.block_border_color }}">
         </div>
 
-        <div>
-          <label>Épaisseur du contour (px) :</label>
+        <div class="form-group">
+          <label>Épaisseur contour</label>
           <input type="number" name="block_border_width" id="block_border_width" value="{{ config.block_border_width }}" min="0" max="10">
         </div>
 
-        <div>
-          <label>Rayon des coins (px) :</label>
+        <div class="form-group">
+          <label>Rayon coins</label>
           <input type="number" name="block_radius" id="block_radius" value="{{ config.block_radius }}" min="0" max="60">
         </div>
 
-        <div>
-          <label>Padding horizontal (px) :</label>
+        <div class="form-group">
+          <label>Padding X blocs</label>
           <input type="number" name="block_padding_x" id="block_padding_x" value="{{ config.block_padding_x }}" min="0" max="80">
         </div>
 
-        <div>
-          <label>Padding vertical (px) :</label>
+        <div class="form-group">
+          <label>Padding Y blocs</label>
           <input type="number" name="block_padding_y" id="block_padding_y" value="{{ config.block_padding_y }}" min="0" max="80">
         </div>
 
-        <div>
-          <label>Espacement entre blocs (px) :</label>
+        <div class="form-group">
+          <label>Espacement blocs</label>
           <input type="number" name="blocks_gap" id="blocks_gap" value="{{ config.blocks_gap }}" min="0" max="80">
         </div>
-
-        <div class="section-title">Labels (J / H / M / S)</div>
-
-        <div class="full-row">
-          <div class="checkbox-row">
-            <input type="checkbox" name="show_labels" id="show_labels" {% if config.show_labels %}checked{% endif %}>
-            <label for="show_labels">Afficher les labels (J / H / M / S)</label>
-          </div>
-          <div class="checkbox-row">
-            <input type="checkbox" name="labels_custom" id="labels_custom" {% if config.labels_custom %}checked{% endif %}>
-            <label for="labels_custom">Labels personnalisés</label>
+	      
+	      <!-- LABELS -->
+        <div class="form-group full">
+          <div class="inline-row">
+            <label>Labels J/H/M/S</label>
+            <div class="inline-checkbox">
+              <input type="checkbox" name="show_labels" id="show_labels" {% if config.show_labels %}checked{% endif %}>
+              <span>Afficher</span>
+            </div>
+            <div class="inline-checkbox">
+              <input type="checkbox" name="labels_custom" id="labels_custom" {% if config.labels_custom %}checked{% endif %}>
+              <span>Personnalisés</span>
+            </div>
           </div>
         </div>
 
-        <div>
-          <label>Couleur des labels :</label>
+        <div class="form-group">
+          <label>Couleur labels</label>
           <input type="color" name="label_color" id="label_color" value="{{ config.label_color }}">
         </div>
 
-        <div>
-          <label>Taille des labels (facteur) :</label>
-          <input type="number" name="label_size_factor" id="label_size_factor" step="0.1" min="0.2" max="1.0" value="{{ config.label_size_factor }}">
+        <div class="form-group">
+          <label>Taille labels (facteur)</label>
+          <input type="number" step="0.1" min="0.2" max="1.0" name="label_size_factor" id="label_size_factor" value="{{ config.label_size_factor }}">
         </div>
 
-        <div></div>
-
-        <div>
-          <label>Texte jours :</label>
+        <div class="form-group">
+          <label>Texte “jours”</label>
           <input type="text" name="label_days" id="label_days" value="{{ config.labels_personalized.days }}">
         </div>
 
-        <div>
-          <label>Texte heures :</label>
+        <div class="form-group">
+          <label>Texte “heures”</label>
           <input type="text" name="label_hours" id="label_hours" value="{{ config.labels_personalized.hours }}">
         </div>
 
-        <div>
-          <label>Texte minutes :</label>
+        <div class="form-group">
+          <label>Texte “minutes”</label>
           <input type="text" name="label_minutes" id="label_minutes" value="{{ config.labels_personalized.minutes }}">
         </div>
 
-        <div>
-          <label>Texte secondes :</label>
+        <div class="form-group">
+          <label>Texte “secondes”</label>
           <input type="text" name="label_seconds" id="label_seconds" value="{{ config.labels_personalized.seconds }}">
         </div>
+	      
+	      <!-- BANNIÈRE -->
+        <div class="form-group full">
+          <label>Bannière (template Banner)</label>
+        </div>
 
-        <div class="section-title">Bannière</div>
-
-        <div>
-          <label>Fond de bannière :</label>
+        <div class="form-group">
+          <label>Fond bannière</label>
           <input type="color" name="banner_bg_color" id="banner_bg_color" value="{{ config.banner_bg_color }}">
         </div>
 
-        <div>
-          <label>Texte de bannière :</label>
+        <div class="form-group">
+          <label>Texte bannière</label>
           <input type="color" name="banner_text_color" id="banner_text_color" value="{{ config.banner_text_color }}">
         </div>
+	      
+	      <!-- PROGRESS BAR -->
+        <div class="form-group full">
+          <label>Barre de progression (template Progress)</label>
+        </div>
 
-        <div></div>
-
-        <div class="section-title">Barre de progression</div>
-
-        <div>
-          <label>Fond de barre :</label>
+        <div class="form-group">
+          <label>Fond barre</label>
           <input type="color" name="progress_bg_color" id="progress_bg_color" value="{{ config.progress_bg_color }}">
         </div>
 
-        <div>
-          <label>Remplissage de barre :</label>
+        <div class="form-group">
+          <label>Remplissage barre</label>
           <input type="color" name="progress_fg_color" id="progress_fg_color" value="{{ config.progress_fg_color }}">
         </div>
 
-        <div>
-          <label>Hauteur de barre (px) :</label>
+        <div class="form-group">
+          <label>Hauteur (px)</label>
           <input type="number" name="progress_height" id="progress_height" value="{{ config.progress_height }}" min="4" max="60">
         </div>
 
-        <div>
-          <label>Fenêtre max (jours) :</label>
+        <div class="form-group">
+          <label>Fenêtre max (jours)</label>
           <input type="number" name="progress_max_days" id="progress_max_days" value="{{ config.progress_max_days }}" min="1" max="365">
         </div>
-
-        <div></div>
-        <div></div>
-
-        <button type="submit">✨ Générer un nouveau countdown</button>
+	      
+	      <!-- SUBMIT -->
+        <button type="submit" class="btn-primary">
+          <span>✨ Générer un nouveau countdown</span>
+        </button>
       </form>
     </div>
 	  
-	  <!-- PREVIEW HTML -->
-    <div class="card">
-      <h2>Aperçu HTML en direct</h2>
-      <div id="htmlPreview">Chargement…</div>
-      <p class="small">Cet aperçu reproduit le style du template choisi. Le GIF réel sera généré pour chaque ID.</p>
-    </div>
-	  
-	  <!-- LIEN DU COUNTDOWN GÉNÉRÉ -->
-    {% if img_link %}
-      <div class="card">
-        <h2>🎉 Countdown généré</h2>
-        <p class="small">Voici ton lien GIF dynamique :</p>
-        <input class="link-input" readonly value="{{ img_link }}" onclick="this.select();">
+	  <!-- COLONNE DROITE : PREVIEW & LIEN -->
+    <div class="preview-wrapper">
 
-        <p class="small">Code HTML prêt à coller dans ton email :</p>
-        <div class="code">
-          &lt;img src="{{ img_link }}" alt="Countdown"&gt;
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">
+              <div class="card-title-icon">👁️</div>
+              Aperçu live
+            </div>
+            <div class="card-subtitle">
+              Simulation HTML du rendu. Le GIF final sera généré pour chaque ID créé.
+            </div>
+          </div>
+          <span class="badge-small">Auto-update • 1s</span>
         </div>
+        <div id="htmlPreview">Choisis une date pour voir l’aperçu.</div>
       </div>
-    {% endif %}
+
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">
+              <div class="card-title-icon">🔗</div>
+              Lien GIF dynamique
+            </div>
+            <div class="card-subtitle">
+              Utilise ce lien dans tes emails. Chaque ID est permanent et indépendant.
+            </div>
+          </div>
+        </div>
+
+        {% if img_link %}
+          <div class="form-group">
+            <label>URL du GIF</label>
+            <input class="link-input" readonly value="{{ img_link }}" onclick="this.select();">
+            <div class="helper-text">Clique pour sélectionner, puis copie/colle dans ton outil d’emailing.</div>
+          </div>
+
+          <div class="form-group">
+            <label>Code HTML à intégrer</label>
+            <div class="code-block">
+              &lt;img src="{{ img_link }}" alt="Countdown"&gt;
+            </div>
+          </div>
+        {% else %}
+          <div class="helper-text">
+            Configure ton countdown puis clique sur <strong>“Générer un nouveau countdown”</strong> pour obtenir l’URL.
+          </div>
+        {% endif %}
+      </div>
+
+    </div>
 
   </div>
+</div>
 
-  <script>
-    const preview = document.getElementById("htmlPreview");
-    
-    function updatePreview() {
-	    const template = document.getElementById("template").value;
-	    const bg = document.getElementById("background_color").value;
-	    const txt = document.getElementById("text_color").value;
-	    const size = parseInt(document.getElementById("font_size").value || "40", 10);
-	    const prefix = document.getElementById("message_prefix").value || "Temps restant : ";
-	    const dateInput = document.getElementById("target_date").value;
-	    
-	    preview.style.backgroundColor = bg;
-	    preview.style.color = txt;
-	    preview.style.fontSize = size + "px";
-	    
-	    if (!dateInput) {
-		    preview.textContent = "Choisis une date pour voir l’aperçu.";
-		    return;
-	    }
-	    
-	    const target = new Date(dateInput);
-	    const now = new Date();
-	    const diff = target - now;
-	    
-	    if (isNaN(diff) || diff <= 0) {
-		    preview.textContent = "⏰ Terminé !";
-		    return;
-	    }
-	    
-	    const totalSeconds = Math.floor(diff / 1000);
-	    const days = Math.floor(totalSeconds / 86400);
-	    const hours = Math.floor((totalSeconds % 86400) / 3600);
-	    const minutes = Math.floor((totalSeconds % 3600) / 60);
-	    const seconds = totalSeconds % 60;
-	    
-	    // Emulation visuelle selon le template
-	    if (template === "minimal") {
-		    preview.textContent =
-				    `${String(days).padStart(2,"0")}:` +
-				    `${String(hours).padStart(2,"0")}:` +
-				    `${String(minutes).padStart(2,"0")}:` +
-				    `${String(seconds).padStart(2,"0")}`;
-	    } else if (template === "banner") {
-		    preview.style.backgroundColor = document.getElementById("banner_bg_color").value;
-		    preview.style.color = document.getElementById("banner_text_color").value;
-		    preview.textContent =
-				    `${prefix}${days} jours ${String(hours).padStart(2,"0")}h ` +
-				    `${String(minutes).padStart(2,"0")}m ${String(seconds).padStart(2,"0")}s`;
-	    } else if (template === "progress") {
-		    const maxDays = parseInt(document.getElementById("progress_max_days").value || "30", 10);
-		    const total = maxDays * 86400;
-		    let ratio = 1 - (totalSeconds / total);
-		    ratio = Math.max(0, Math.min(1, ratio));
-		    const barBg = document.getElementById("progress_bg_color").value;
-		    const barFg = document.getElementById("progress_fg_color").value;
-		    
-		    preview.innerHTML = `
-          <div style="width:100%;max-width:600px;">
-            <div style="width:100%;height:16px;border-radius:8px;background:${barBg};overflow:hidden;">
-              <div style="width:${(ratio*100).toFixed(1)}%;height:100%;background:${barFg};"></div>
-            </div>
-            <div style="margin-top:8px;font-size:${size * 0.6}px;">
-              ${prefix}${days}j ${String(hours).padStart(2,"0")}:${String(minutes).padStart(2,"0")}:${String(seconds).padStart(2,"0")}
-            </div>
+<script>
+  const preview = document.getElementById("htmlPreview");
+  const fontSizeInput = document.getElementById("font_size");
+  const fontSizeValue = document.getElementById("fontSizeValue");
+  
+  function updatePreview() {
+	  const template = document.getElementById("template").value;
+	  const bg = document.getElementById("background_color").value;
+	  const txt = document.getElementById("text_color").value;
+	  const size = parseInt(fontSizeInput.value || "40", 10);
+	  const prefix = document.getElementById("message_prefix").value || "Temps restant : ";
+	  const dateInput = document.getElementById("target_date").value;
+	  
+	  fontSizeValue.textContent = size;
+	  preview.style.color = txt;
+	  
+	  if (!dateInput) {
+		  preview.style.background = "radial-gradient(circle at top left,#020617 0,#020617 40%,#020617 100%)";
+		  preview.textContent = "Choisis une date pour voir l’aperçu.";
+		  return;
+	  }
+	  
+	  const target = new Date(dateInput);
+	  const now = new Date();
+	  const diff = target - now;
+	  
+	  if (isNaN(diff)) {
+		  preview.textContent = "Date invalide";
+		  return;
+	  }
+	  if (diff <= 0) {
+		  preview.textContent = "⏰ Terminé !";
+		  return;
+	  }
+	  
+	  const totalSeconds = Math.floor(diff / 1000);
+	  const days = Math.floor(totalSeconds / 86400);
+	  const hours = Math.floor((totalSeconds % 86400) / 3600);
+	  const minutes = Math.floor((totalSeconds % 3600) / 60);
+	  const seconds = totalSeconds % 60;
+	  
+	  preview.style.fontSize = size + "px";
+	  
+	  // BACKGROUND de base
+	  preview.style.background = bg;
+	  
+	  // Emulation par template
+	  if (template === "minimal") {
+		  preview.textContent =
+				  `${String(days).padStart(2,"0")}:` +
+				  `${String(hours).padStart(2,"0")}:` +
+				  `${String(minutes).padStart(2,"0")}:` +
+				  `${String(seconds).padStart(2,"0")}`;
+	  } else if (template === "banner") {
+		  const bannerBg = document.getElementById("banner_bg_color").value;
+		  const bannerTxt = document.getElementById("banner_text_color").value;
+		  preview.style.background = bannerBg;
+		  preview.style.color = bannerTxt;
+		  preview.textContent =
+				  `${prefix}${days} jours ${String(hours).padStart(2,"0")}h ` +
+				  `${String(minutes).padStart(2,"0")}m ${String(seconds).padStart(2,"0")}s`;
+	  } else if (template === "progress") {
+		  const maxDays = parseInt(document.getElementById("progress_max_days").value || "30", 10);
+		  const total = maxDays * 86400;
+		  let ratio = 1 - (totalSeconds / total);
+		  ratio = Math.max(0, Math.min(1, ratio));
+		  const barBg = document.getElementById("progress_bg_color").value;
+		  const barFg = document.getElementById("progress_fg_color").value;
+		  
+		  preview.innerHTML = `
+        <div style="width:100%;max-width:600px;">
+          <div style="width:100%;height:16px;border-radius:999px;background:${barBg};overflow:hidden;">
+            <div style="width:${(ratio*100).toFixed(1)}%;height:100%;background:${barFg};"></div>
           </div>
-        `;
-	    } else {
-		    // Classic / blocks / flip / bubble -> aperçu simple type blocs
-		    const labelDays = document.getElementById("label_days").value || "J";
-		    const labelHours = document.getElementById("label_hours").value || "H";
-		    const labelMinutes = document.getElementById("label_minutes").value || "M";
-		    const labelSeconds = document.getElementById("label_seconds").value || "S";
-		    const showLabels = document.getElementById("show_labels").checked;
-		    const blockBg = document.getElementById("block_bg_color").value;
-		    const blockBorder = document.getElementById("block_border_color").value;
-		    
-		    preview.innerHTML = `
-          <div style="display:flex;gap:10px;align-items:center;justify-content:center;">
-            <div style="padding:8px 12px;border-radius:10px;background:${blockBg};border:1px solid ${blockBorder};">
-              <div>${String(days).padStart(2,"0")}</div>
-              ${showLabels ? `<div style="font-size:${size*0.4}px;">${labelDays}</div>` : ""}
-            </div>
-            <div style="padding:8px 12px;border-radius:10px;background:${blockBg};border:1px solid ${blockBorder};">
-              <div>${String(hours).padStart(2,"0")}</div>
-              ${showLabels ? `<div style="font-size:${size*0.4}px;">${labelHours}</div>` : ""}
-            </div>
-            <div style="padding:8px 12px;border-radius:10px;background:${blockBg};border:1px solid ${blockBorder};">
-              <div>${String(minutes).padStart(2,"0")}</div>
-              ${showLabels ? `<div style="font-size:${size*0.4}px;">${labelMinutes}</div>` : ""}
-            </div>
-            <div style="padding:8px 12px;border-radius:10px;background:${blockBg};border:1px solid ${blockBorder};">
-              <div>${String(seconds).padStart(2,"0")}</div>
-              ${showLabels ? `<div style="font-size:${size*0.4}px;">${labelSeconds}</div>` : ""}
-            </div>
+          <div style="margin-top:10px;font-size:${size * 0.6}px;">
+            ${prefix}${days}j ${String(hours).padStart(2,"0")}:${String(minutes).padStart(2,"0")}:${String(seconds).padStart(2,"0")}
           </div>
-        `;
-	    }
-    }
-    
-    setInterval(updatePreview, 1000);
-    document.getElementById("configForm").addEventListener("input", updatePreview);
-    updatePreview();
-  </script>
+        </div>
+      `;
+	  } else {
+		  // Classic / blocks / flip / bubble -> aperçu façon blocs
+		  const labelDays = document.getElementById("label_days").value || "J";
+		  const labelHours = document.getElementById("label_hours").value || "H";
+		  const labelMinutes = document.getElementById("label_minutes").value || "M";
+		  const labelSeconds = document.getElementById("label_seconds").value || "S";
+		  const showLabels = document.getElementById("show_labels").checked;
+		  const blockBg = document.getElementById("block_bg_color").value;
+		  const blockBorder = document.getElementById("block_border_color").value;
+		  
+		  preview.innerHTML = `
+        <div style="display:flex;gap:10px;align-items:center;justify-content:center;">
+          <div style="padding:8px 12px;border-radius:10px;background:${blockBg};border:1px solid ${blockBorder};">
+            <div>${String(days).padStart(2,"0")}</div>
+            ${showLabels ? `<div style="font-size:${size*0.4}px;">${labelDays}</div>` : ""}
+          </div>
+          <div style="padding:8px 12px;border-radius:10px;background:${blockBg};border:1px solid ${blockBorder};">
+            <div>${String(hours).padStart(2,"0")}</div>
+            ${showLabels ? `<div style="font-size:${size*0.4}px;">${labelHours}</div>` : ""}
+          </div>
+          <div style="padding:8px 12px;border-radius:10px;background:${blockBg};border:1px solid ${blockBorder};">
+            <div>${String(minutes).padStart(2,"0")}</div>
+            ${showLabels ? `<div style="font-size:${size*0.4}px;">${labelMinutes}</div>` : ""}
+          </div>
+          <div style="padding:8px 12px;border-radius:10px;background:${blockBg};border:1px solid ${blockBorder};">
+            <div>${String(seconds).padStart(2,"0")}</div>
+            ${showLabels ? `<div style="font-size:${size*0.4}px;">${labelSeconds}</div>` : ""}
+          </div>
+        </div>
+      `;
+	  }
+  }
+  
+  setInterval(updatePreview, 1000);
+  document.getElementById("configForm").addEventListener("input", updatePreview);
+  updatePreview();
+</script>
 
 </body>
 </html>
