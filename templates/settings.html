@@ -62,6 +62,11 @@
 	          <option value="minimal"  {% if config.template == 'minimal'  %}selected{% endif %}>Minimal</option>
 	          <option value="banner"   {% if config.template == 'banner'   %}selected{% endif %}>Banner</option>
 	          <option value="progress" {% if config.template == 'progress' %}selected{% endif %}>Progress bar</option>
+	          <option value="neon"     {% if config.template == 'neon'     %}selected{% endif %}>Neon</option>
+	          <option value="glass"    {% if config.template == 'glass'    %}selected{% endif %}>Glass</option>
+	          <option value="pill"     {% if config.template == 'pill'     %}selected{% endif %}>Pill</option>
+	          <option value="circle"   {% if config.template == 'circle'   %}selected{% endif %}>Circle timer</option>
+	          <option value="badge"    {% if config.template == 'badge'    %}selected{% endif %}>Badge</option>
           </select>
         </div>
 
@@ -252,27 +257,10 @@
       </form>
     </div>
 	  
-	  <!-- COLONNE DROITE : MINI + GRAND APERÇU + LIEN -->
+	  <!-- COLONNE DROITE : APERÇU + LIEN -->
     <div class="preview-wrapper">
 
-      <!-- MINI PREVIEW STICKY -->
-      <div class="card">
-        <div class="card-header">
-          <div>
-            <div class="card-title">
-              <div class="card-title-icon">🔍</div>
-              Mini aperçu
-            </div>
-            <div class="card-subtitle">
-              Aperçu compact toujours visible pendant que tu modifies les options.
-            </div>
-          </div>
-          <span class="badge-small">Live</span>
-        </div>
-        <div id="miniPreview">Choisis un template et une date pour voir l’aperçu.</div>
-      </div>
-	    
-	    <!-- GRAND PREVIEW -->
+      <!-- GRAND PREVIEW -->
       <div class="card">
         <div class="card-header">
           <div>
@@ -281,10 +269,10 @@
               Aperçu détaillé
             </div>
             <div class="card-subtitle">
-              Simulation HTML du rendu final. Le GIF généré utilisera ce style.
+              Simulation HTML du rendu final. Le GIF généré utilisera ce style (ou le style le plus proche).
             </div>
           </div>
-          <span class="badge-small">Auto-update • 1s</span>
+          <span class="badge-small">Live</span>
         </div>
         <div id="htmlPreview">Choisis une date pour voir l’aperçu.</div>
       </div>
