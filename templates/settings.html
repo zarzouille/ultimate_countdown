@@ -2,321 +2,471 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Créer un compte à rebours</title>
-	
-	<!-- CSS EXTERNE -->
+  <title>Ultimate Countdown – Configuration</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/settings.css') }}">
 </head>
 <body>
 
-<div class="page-wrapper">
+<div class="uc-page">
   <!-- HEADER -->
-  <header class="header">
-    <div class="header-left">
-      <div class="title-row">
-        <span>🕒 Countdown Studio</span>
-        <span class="pill">Multi-templates • Email ready</span>
+  <header class="uc-header">
+    <div>
+      <div class="uc-logo-row">
+        <span class="uc-logo">⏳ Ultimate Countdown</span>
+        <span class="uc-pill">Email-ready • GIF dynamique</span>
       </div>
-      <div class="subtitle">
-        Configure ton compte à rebours, visualise le rendu en live, puis récupère un lien GIF dynamique prêt à intégrer dans tes emails.
-      </div>
+      <p class="uc-subtitle">
+        Choisis un template, personnalise le design, prévisualise en direct et génère un lien GIF unique à intégrer dans tes emails.
+      </p>
     </div>
-    <div class="header-actions">
-      <a href="/admin" class="btn-ghost"><span class="icon">🔐</span>Admin</a>
-      <a href="/list" class="btn-ghost"><span class="icon">📋</span>Liste</a>
+    <div class="uc-header-actions">
+      <a href="/admin" class="uc-btn-ghost">🔐 Admin</a>
+      <a href="/list" class="uc-btn-ghost">📋 Mes countdowns</a>
     </div>
   </header>
-	
-	<!-- LAYOUT 2 COLONNES -->
-  <div class="layout">
 
+  <div class="uc-layout">
     <!-- COLONNE GAUCHE : FORMULAIRE -->
-    <div class="card">
-      <div class="card-header">
-        <div>
-          <div class="card-title">
-            <div class="card-title-icon">🎛</div>
-            Configurer un nouveau countdown
-          </div>
-          <div class="card-subtitle">
-            Tous les paramètres sont enregistrés dans un ID unique. Chaque création génère un GIF indépendant.
-          </div>
-        </div>
-      </div>
+    <section class="uc-card">
+      <h2 class="uc-card-title">Configurer un nouveau countdown</h2>
+      <p class="uc-card-subtitle">
+        Chaque enregistrement crée un ID unique. Tu peux générer autant de countdowns que tu veux, indépendamment.
+      </p>
 
-      <form method="POST" id="configForm">
+      <form method="POST" id="configForm" class="uc-form">
 
-        <!-- GÉNÉRAL -->
-        <div class="form-group full">
-          <label>Date cible <span class="hint">Obligatoire</span></label>
-          <input type="datetime-local" name="target_date" id="target_date" value="{{ target_date }}" required>
-        </div>
+        <!-- ACCORDÉON : GÉNÉRAL -->
+        <div class="uc-accordion">
+          <button type="button" class="uc-acc-header" data-acc-target="section-general">
+            <span>⚙️ Paramètres généraux</span>
+            <span class="uc-acc-chevron">▾</span>
+          </button>
+          <div id="section-general" class="uc-acc-body uc-acc-open">
+            <div class="uc-form-grid">
+              <div class="uc-field uc-field-full">
+                <label for="target_date">
+                  Date cible
+                  <span class="uc-hint">Obligatoire</span>
+                </label>
+                <input type="datetime-local" name="target_date" id="target_date" value="{{ target_date }}" required>
+              </div>
 
-        <div class="form-group">
-          <label>Template <span class="hint">Style global</span></label>
-          <select name="template" id="template">
-            <option value="classic"  {% if config.template == 'classic'  %}selected{% endif %}>Classic</option>
-	          <option value="blocks"   {% if config.template == 'blocks'   %}selected{% endif %}>Blocks</option>
-	          <option value="flip"     {% if config.template == 'flip'     %}selected{% endif %}>Flip clock</option>
-	          <option value="bubble"   {% if config.template == 'bubble'   %}selected{% endif %}>Bubble</option>
-	          <option value="minimal"  {% if config.template == 'minimal'  %}selected{% endif %}>Minimal</option>
-	          <option value="banner"   {% if config.template == 'banner'   %}selected{% endif %}>Banner</option>
-	          <option value="progress" {% if config.template == 'progress' %}selected{% endif %}>Progress bar</option>
-	          <option value="neon"     {% if config.template == 'neon'     %}selected{% endif %}>Neon</option>
-	          <option value="glass"    {% if config.template == 'glass'    %}selected{% endif %}>Glass</option>
-	          <option value="pill"     {% if config.template == 'pill'     %}selected{% endif %}>Pill</option>
-	          <option value="circle"   {% if config.template == 'circle'   %}selected{% endif %}>Circle timer</option>
-	          <option value="badge"    {% if config.template == 'badge'    %}selected{% endif %}>Badge</option>
-          </select>
-        </div>
+              <div class="uc-field">
+                <label for="template">
+                  Template
+                  <span class="uc-hint">Choisis un style</span>
+                </label>
+                <select name="template" id="template">
+                  <option value="classic"  {% if config.template == 'classic'  %}selected{% endif %}>Classic</option>
+	                <option value="blocks"   {% if config.template == 'blocks'   %}selected{% endif %}>Blocks</option>
+	                <option value="flip"     {% if config.template == 'flip'     %}selected{% endif %}>Flip clock</option>
+	                <option value="bubble"   {% if config.template == 'bubble'   %}selected{% endif %}>Bubble</option>
+	                <option value="minimal"  {% if config.template == 'minimal'  %}selected{% endif %}>Minimal</option>
+	                <option value="banner"   {% if config.template == 'banner'   %}selected{% endif %}>Banner</option>
+	                <option value="progress" {% if config.template == 'progress' %}selected{% endif %}>Progress bar</option>
+	                <option value="neon"     {% if config.template == 'neon'     %}selected{% endif %}>Neon</option>
+	                <option value="glass"    {% if config.template == 'glass'    %}selected{% endif %}>Glass</option>
+	                <option value="pill"     {% if config.template == 'pill'     %}selected{% endif %}>Pill</option>
+	                <option value="circle"   {% if config.template == 'circle'   %}selected{% endif %}>Circle timer</option>
+	                <option value="badge"    {% if config.template == 'badge'    %}selected{% endif %}>Badge</option>
+                </select>
+              </div>
 
-        <div class="form-group">
-          <label>Alignement</label>
-          <select name="alignment" id="alignment">
-            <option value="left"   {% if config.alignment == 'left'   %}selected{% endif %}>Gauche</option>
-	          <option value="center" {% if config.alignment == 'center' %}selected{% endif %}>Centré</option>
-	          <option value="right"  {% if config.alignment == 'right'  %}selected{% endif %}>Droite</option>
-          </select>
-        </div>
+              <div class="uc-field">
+                <label for="alignment">Alignement</label>
+                <select name="alignment" id="alignment">
+                  <option value="left"   {% if config.alignment == 'left'   %}selected{% endif %}>Gauche</option>
+	                <option value="center" {% if config.alignment == 'center' %}selected{% endif %}>Centré</option>
+	                <option value="right"  {% if config.alignment == 'right'  %}selected{% endif %}>Droite</option>
+                </select>
+              </div>
 
-        <div class="form-group">
-          <label>Couleur de fond</label>
-          <input type="color" name="background_color" id="background_color" value="{{ config.background_color }}">
-        </div>
+              <div class="uc-field">
+                <label for="background_color">Couleur de fond</label>
+                <input type="color" name="background_color" id="background_color" value="{{ config.background_color }}">
+              </div>
 
-        <div class="form-group">
-          <label>Couleur du texte</label>
-          <input type="color" name="text_color" id="text_color" value="{{ config.text_color }}">
-        </div>
+              <div class="uc-field">
+                <label for="text_color">Couleur du texte</label>
+                <input type="color" name="text_color" id="text_color" value="{{ config.text_color }}">
+              </div>
 
-        <div class="form-group">
-          <label>Taille du texte</label>
-          <div class="range-row">
-            <input type="range" min="10" max="120" name="font_size" id="font_size" value="{{ config.font_size }}">
-            <div class="range-value"><span id="fontSizeValue">{{ config.font_size }}</span> px</div>
-          </div>
-        </div>
+              <div class="uc-field">
+                <label for="font_size">Taille du texte</label>
+                <div class="uc-range-row">
+                  <input type="range" min="10" max="120" name="font_size" id="font_size" value="{{ config.font_size }}">
+                  <span class="uc-range-value"><span id="fontSizeValue">{{ config.font_size }}</span> px</span>
+                </div>
+              </div>
 
-        <div class="form-group full">
-          <label>Préfixe du message <span class="hint">Ex : “Temps restant : ”</span></label>
-          <input type="text" name="message_prefix" id="message_prefix" value="{{ config.message_prefix }}">
-        </div>
-	      
-	      <!-- ICÔNE -->
-        <div class="form-group">
-          <label>Icône</label>
-          <input type="text" name="icon" id="icon" value="{{ config.icon }}" placeholder="ex : ⏳, 🔥, 🎉">
-        </div>
+              <div class="uc-field uc-field-full">
+                <label for="message_prefix">
+                  Préfixe du message
+                  <span class="uc-hint">Ex : “Temps restant : ”</span>
+                </label>
+                <input type="text" name="message_prefix" id="message_prefix" value="{{ config.message_prefix }}">
+              </div>
 
-        <div class="form-group">
-          <label>Position de l’icône</label>
-          <select name="icon_position" id="icon_position">
-            <option value="left"   {% if config.icon_position == 'left'   %}selected{% endif %}>Avant le texte</option>
-	          <option value="right"  {% if config.icon_position == 'right'  %}selected{% endif %}>Après le texte</option>
-	          <option value="above"  {% if config.icon_position == 'above'  %}selected{% endif %}>Au-dessus</option>
-          </select>
-        </div>
+              <div class="uc-field">
+                <label for="icon">Icône</label>
+                <input type="text" name="icon" id="icon" value="{{ config.icon }}" placeholder="ex : ⏳, 🔥, 🎉">
+              </div>
 
-        <div class="form-group">
-          <label>Padding (px)</label>
-          <input type="number" name="padding" id="padding" value="{{ config.padding }}" min="0" max="100">
-        </div>
-	      
-	      <!-- BLOCS -->
-        <div class="form-group full">
-          <label>Blocs (Blocks / Flip / Bubble)</label>
-          <div class="template-badges">
-            <span class="badge-template">Fond, contour, arrondis, espacements…</span>
-          </div>
-        </div>
+              <div class="uc-field">
+                <label for="icon_position">Position de l’icône</label>
+                <select name="icon_position" id="icon_position">
+                  <option value="left"   {% if config.icon_position == 'left'   %}selected{% endif %}>Avant le texte</option>
+	                <option value="right"  {% if config.icon_position == 'right'  %}selected{% endif %}>Après le texte</option>
+	                <option value="above"  {% if config.icon_position == 'above'  %}selected{% endif %}>Au-dessus</option>
+                </select>
+              </div>
 
-        <div class="form-group">
-          <label>Fond blocs</label>
-          <input type="color" name="block_bg_color" id="block_bg_color" value="{{ config.block_bg_color }}">
-        </div>
-
-        <div class="form-group">
-          <label>Contour blocs</label>
-          <input type="color" name="block_border_color" id="block_border_color" value="{{ config.block_border_color }}">
-        </div>
-
-        <div class="form-group">
-          <label>Épaisseur contour</label>
-          <input type="number" name="block_border_width" id="block_border_width" value="{{ config.block_border_width }}" min="0" max="10">
-        </div>
-
-        <div class="form-group">
-          <label>Rayon coins</label>
-          <input type="number" name="block_radius" id="block_radius" value="{{ config.block_radius }}" min="0" max="60">
-        </div>
-
-        <div class="form-group">
-          <label>Padding X blocs</label>
-          <input type="number" name="block_padding_x" id="block_padding_x" value="{{ config.block_padding_x }}" min="0" max="80">
-        </div>
-
-        <div class="form-group">
-          <label>Padding Y blocs</label>
-          <input type="number" name="block_padding_y" id="block_padding_y" value="{{ config.block_padding_y }}" min="0" max="80">
-        </div>
-
-        <div class="form-group">
-          <label>Espacement blocs</label>
-          <input type="number" name="blocks_gap" id="blocks_gap" value="{{ config.blocks_gap }}" min="0" max="80">
-        </div>
-	      
-	      <!-- LABELS -->
-        <div class="form-group full">
-          <div class="inline-row">
-            <label>Labels J/H/M/S</label>
-            <div class="inline-checkbox">
-              <input type="checkbox" name="show_labels" id="show_labels" {% if config.show_labels %}checked{% endif %}>
-              <span>Afficher</span>
-            </div>
-            <div class="inline-checkbox">
-              <input type="checkbox" name="labels_custom" id="labels_custom" {% if config.labels_custom %}checked{% endif %}>
-              <span>Personnalisés</span>
+              <div class="uc-field">
+                <label for="padding">Padding global (px)</label>
+                <input type="number" name="padding" id="padding" value="{{ config.padding }}" min="0" max="100">
+              </div>
             </div>
           </div>
         </div>
+	      
+	      <!-- ACCORDÉON : BLOCS / FLIP / BUBBLE -->
+        <div class="uc-accordion uc-template-section" data-templates="blocks,flip,bubble,badge">
+          <button type="button" class="uc-acc-header" data-acc-target="section-blocks">
+            <span>🧱 Options Blocks / Flip / Bubble / Badge</span>
+            <span class="uc-acc-chevron">▾</span>
+          </button>
+          <div id="section-blocks" class="uc-acc-body">
+            <div class="uc-form-grid">
+              <div class="uc-field">
+                <label for="block_bg_color">Fond blocs</label>
+                <input type="color" name="block_bg_color" id="block_bg_color" value="{{ config.block_bg_color }}">
+              </div>
 
-        <div class="form-group">
-          <label>Couleur labels</label>
-          <input type="color" name="label_color" id="label_color" value="{{ config.label_color }}">
-        </div>
+              <div class="uc-field">
+                <label for="block_border_color">Contour blocs</label>
+                <input type="color" name="block_border_color" id="block_border_color" value="{{ config.block_border_color }}">
+              </div>
 
-        <div class="form-group">
-          <label>Taille labels (facteur)</label>
-          <input type="number" step="0.1" min="0.2" max="1.0" name="label_size_factor" id="label_size_factor" value="{{ config.label_size_factor }}">
-        </div>
+              <div class="uc-field">
+                <label for="block_border_width">Épaisseur contour</label>
+                <input type="number" name="block_border_width" id="block_border_width" value="{{ config.block_border_width }}" min="0" max="10">
+              </div>
 
-        <div class="form-group">
-          <label>Texte “jours”</label>
-          <input type="text" name="label_days" id="label_days" value="{{ config.labels_personalized.days }}">
-        </div>
+              <div class="uc-field">
+                <label for="block_radius">Rayon coins</label>
+                <input type="number" name="block_radius" id="block_radius" value="{{ config.block_radius }}" min="0" max="60">
+              </div>
 
-        <div class="form-group">
-          <label>Texte “heures”</label>
-          <input type="text" name="label_hours" id="label_hours" value="{{ config.labels_personalized.hours }}">
-        </div>
+              <div class="uc-field">
+                <label for="block_padding_x">Padding X blocs</label>
+                <input type="number" name="block_padding_x" id="block_padding_x" value="{{ config.block_padding_x }}" min="0" max="80">
+              </div>
 
-        <div class="form-group">
-          <label>Texte “minutes”</label>
-          <input type="text" name="label_minutes" id="label_minutes" value="{{ config.labels_personalized.minutes }}">
-        </div>
+              <div class="uc-field">
+                <label for="block_padding_y">Padding Y blocs</label>
+                <input type="number" name="block_padding_y" id="block_padding_y" value="{{ config.block_padding_y }}" min="0" max="80">
+              </div>
 
-        <div class="form-group">
-          <label>Texte “secondes”</label>
-          <input type="text" name="label_seconds" id="label_seconds" value="{{ config.labels_personalized.seconds }}">
+              <div class="uc-field">
+                <label for="blocks_gap">Espacement blocs</label>
+                <input type="number" name="blocks_gap" id="blocks_gap" value="{{ config.blocks_gap }}" min="0" max="80">
+              </div>
+            </div>
+          </div>
         </div>
 	      
-	      <!-- BANNIÈRE -->
-        <div class="form-group full">
-          <label>Bannière (template Banner)</label>
-        </div>
+	      <!-- ACCORDÉON : LABELS -->
+        <div class="uc-accordion uc-template-section" data-templates="classic,blocks,flip,bubble,minimal,banner,progress,neon,glass,pill,circle,badge">
+          <button type="button" class="uc-acc-header" data-acc-target="section-labels">
+            <span>🔤 Labels J/H/M/S</span>
+            <span class="uc-acc-chevron">▾</span>
+          </button>
+          <div id="section-labels" class="uc-acc-body">
+            <div class="uc-form-grid">
+              <div class="uc-field uc-field-full uc-inline">
+                <label>Labels</label>
+                <div class="uc-inline-group">
+                  <label class="uc-inline-checkbox">
+                    <input type="checkbox" name="show_labels" id="show_labels" {% if config.show_labels %}checked{% endif %}>
+                    <span>Afficher</span>
+                  </label>
+                  <label class="uc-inline-checkbox">
+                    <input type="checkbox" name="labels_custom" id="labels_custom" {% if config.labels_custom %}checked{% endif %}>
+                    <span>Texte personnalisé</span>
+                  </label>
+                </div>
+              </div>
 
-        <div class="form-group">
-          <label>Fond bannière</label>
-          <input type="color" name="banner_bg_color" id="banner_bg_color" value="{{ config.banner_bg_color }}">
-        </div>
+              <div class="uc-field">
+                <label for="label_color">Couleur labels</label>
+                <input type="color" name="label_color" id="label_color" value="{{ config.label_color }}">
+              </div>
 
-        <div class="form-group">
-          <label>Texte bannière</label>
-          <input type="color" name="banner_text_color" id="banner_text_color" value="{{ config.banner_text_color }}">
+              <div class="uc-field">
+                <label for="label_size_factor">Taille labels (facteur)</label>
+                <input type="number" step="0.1" min="0.2" max="1.0" name="label_size_factor" id="label_size_factor" value="{{ config.label_size_factor }}">
+              </div>
+
+              <div class="uc-field">
+                <label for="label_days">Texte “jours”</label>
+                <input type="text" name="label_days" id="label_days" value="{{ config.labels_personalized.days }}">
+              </div>
+
+              <div class="uc-field">
+                <label for="label_hours">Texte “heures”</label>
+                <input type="text" name="label_hours" id="label_hours" value="{{ config.labels_personalized.hours }}">
+              </div>
+
+              <div class="uc-field">
+                <label for="label_minutes">Texte “minutes”</label>
+                <input type="text" name="label_minutes" id="label_minutes" value="{{ config.labels_personalized.minutes }}">
+              </div>
+
+              <div class="uc-field">
+                <label for="label_seconds">Texte “secondes”</label>
+                <input type="text" name="label_seconds" id="label_seconds" value="{{ config.labels_personalized.seconds }}">
+              </div>
+            </div>
+          </div>
         </div>
 	      
-	      <!-- PROGRESS BAR -->
-        <div class="form-group full">
-          <label>Barre de progression (template Progress)</label>
-        </div>
+	      <!-- ACCORDÉON : BANNER -->
+        <div class="uc-accordion uc-template-section" data-templates="banner">
+          <button type="button" class="uc-acc-header" data-acc-target="section-banner">
+            <span>📢 Options Banner</span>
+            <span class="uc-acc-chevron">▾</span>
+          </button>
+          <div id="section-banner" class="uc-acc-body">
+            <div class="uc-form-grid">
+              <div class="uc-field">
+                <label for="banner_bg_color">Fond bannière</label>
+                <input type="color" name="banner_bg_color" id="banner_bg_color" value="{{ config.banner_bg_color }}">
+              </div>
 
-        <div class="form-group">
-          <label>Fond barre</label>
-          <input type="color" name="progress_bg_color" id="progress_bg_color" value="{{ config.progress_bg_color }}">
-        </div>
-
-        <div class="form-group">
-          <label>Remplissage barre</label>
-          <input type="color" name="progress_fg_color" id="progress_fg_color" value="{{ config.progress_fg_color }}">
-        </div>
-
-        <div class="form-group">
-          <label>Hauteur (px)</label>
-          <input type="number" name="progress_height" id="progress_height" value="{{ config.progress_height }}" min="4" max="60">
-        </div>
-
-        <div class="form-group">
-          <label>Fenêtre max (jours)</label>
-          <input type="number" name="progress_max_days" id="progress_max_days" value="{{ config.progress_max_days }}" min="1" max="365">
+              <div class="uc-field">
+                <label for="banner_text_color">Texte bannière</label>
+                <input type="color" name="banner_text_color" id="banner_text_color" value="{{ config.banner_text_color }}">
+              </div>
+            </div>
+          </div>
         </div>
 	      
-	      <!-- SUBMIT -->
-        <button type="submit" class="btn-primary">
-          <span>✨ Générer un nouveau countdown</span>
+	      <!-- ACCORDÉON : PROGRESS -->
+        <div class="uc-accordion uc-template-section" data-templates="progress">
+          <button type="button" class="uc-acc-header" data-acc-target="section-progress">
+            <span>📊 Options Progress bar</span>
+            <span class="uc-acc-chevron">▾</span>
+          </button>
+          <div id="section-progress" class="uc-acc-body">
+            <div class="uc-form-grid">
+              <div class="uc-field">
+                <label for="progress_bg_color">Fond barre</label>
+                <input type="color" name="progress_bg_color" id="progress_bg_color" value="{{ config.progress_bg_color }}">
+              </div>
+
+              <div class="uc-field">
+                <label for="progress_fg_color">Remplissage barre</label>
+                <input type="color" name="progress_fg_color" id="progress_fg_color" value="{{ config.progress_fg_color }}">
+              </div>
+
+              <div class="uc-field">
+                <label for="progress_height">Hauteur barre (px)</label>
+                <input type="number" name="progress_height" id="progress_height" value="{{ config.progress_height }}" min="4" max="60">
+              </div>
+
+              <div class="uc-field">
+                <label for="progress_max_days">Fenêtre max (jours)</label>
+                <input type="number" name="progress_max_days" id="progress_max_days" value="{{ config.progress_max_days }}" min="1" max="365">
+              </div>
+            </div>
+          </div>
+        </div>
+	      
+	      <!-- ACCORDÉON : NEON / GLASS / PILL / CIRCLE / BADGE options spécifiques -->
+        <div class="uc-accordion uc-template-section" data-templates="neon,glass,pill,circle,badge">
+          <button type="button" class="uc-acc-header" data-acc-target="section-specials">
+            <span>✨ Options templates spéciaux</span>
+            <span class="uc-acc-chevron">▾</span>
+          </button>
+          <div id="section-specials" class="uc-acc-body">
+            <div class="uc-form-grid">
+              <div class="uc-field">
+                <label for="neon_glow_color">Couleur glow (Neon)</label>
+                <input type="color" name="neon_glow_color" id="neon_glow_color" value="{{ config.neon_glow_color or '#00f0ff' }}">
+              </div>
+
+              <div class="uc-field">
+                <label for="glass_border_color">Contour Glass</label>
+                <input type="color" name="glass_border_color" id="glass_border_color" value="{{ config.glass_border_color or '#d1d5db' }}">
+              </div>
+
+              <div class="uc-field">
+                <label for="glass_bg_tint">Teinte fond Glass</label>
+                <input type="color" name="glass_bg_tint" id="glass_bg_tint" value="{{ config.glass_bg_tint or '#e5f0ff' }}">
+              </div>
+
+              <div class="uc-field">
+                <label for="circle_accent_color">Couleur cercle</label>
+                <input type="color" name="circle_accent_color" id="circle_accent_color" value="{{ config.circle_accent_color or '#3b82f6' }}">
+              </div>
+
+              <div class="uc-field">
+                <label for="badge_bg_color">Fond badge</label>
+                <input type="color" name="badge_bg_color" id="badge_bg_color" value="{{ config.badge_bg_color or '#111827' }}">
+              </div>
+
+              <div class="uc-field">
+                <label for="badge_accent_color">Accent badge</label>
+                <input type="color" name="badge_accent_color" id="badge_accent_color" value="{{ config.badge_accent_color or '#3b82f6' }}">
+              </div>
+            </div>
+          </div>
+        </div>
+	      
+	      <!-- ACCORDÉON : AVANCÉ -->
+        <div class="uc-accordion">
+          <button type="button" class="uc-acc-header" data-acc-target="section-advanced">
+            <span>🛠 Options avancées</span>
+            <span class="uc-acc-chip">Expert</span>
+            <span class="uc-acc-chevron">▾</span>
+          </button>
+          <div id="section-advanced" class="uc-acc-body uc-acc-collapsed">
+            <div class="uc-form-grid">
+              <div class="uc-field">
+                <label for="blur_amount">
+                  Blur / flou (Glass)
+                  <span class="uc-hint">0 = aucun</span>
+                </label>
+                <input type="range" min="0" max="20" name="blur_amount" id="blur_amount" value="{{ config.blur_amount or 10 }}">
+              </div>
+
+              <div class="uc-field uc-inline">
+                <label>Ombres</label>
+                <div class="uc-inline-group">
+                  <label class="uc-inline-checkbox">
+                    <input type="checkbox" name="text_shadow" id="text_shadow" {% if config.text_shadow %}checked{% endif %}>
+                    <span>Texte</span>
+                  </label>
+                  <label class="uc-inline-checkbox">
+                    <input type="checkbox" name="block_shadow" id="block_shadow" {% if config.block_shadow %}checked{% endif %}>
+                    <span>Blocs</span>
+                  </label>
+                </div>
+              </div>
+
+              <div class="uc-field">
+                <label for="border_radius_override">
+                  Rayon global override
+                  <span class="uc-hint">0 = auto</span>
+                </label>
+                <input type="number" name="border_radius_override" id="border_radius_override" value="{{ config.border_radius_override or 0 }}" min="0" max="40">
+              </div>
+
+              <div class="uc-field">
+                <label for="spacing_scale">
+                  Espacements (facteur)
+                  <span class="uc-hint">1 = normal</span>
+                </label>
+                <input type="range" min="0.5" max="2" step="0.1" name="spacing_scale" id="spacing_scale" value="{{ config.spacing_scale or 1 }}">
+              </div>
+
+              <div class="uc-field">
+                <label for="rotate_deg">Rotation légère (°)</label>
+                <input type="range" min="-8" max="8" step="1" name="rotate_deg" id="rotate_deg" value="{{ config.rotate_deg or 0 }}">
+              </div>
+
+              <div class="uc-field uc-inline">
+                <label>Styles texte</label>
+                <div class="uc-inline-group">
+                  <label class="uc-inline-checkbox">
+                    <input type="checkbox" name="gradient_text" id="gradient_text" {% if config.gradient_text %}checked{% endif %}>
+                    <span>Texte dégradé</span>
+                  </label>
+                  <label class="uc-inline-checkbox">
+                    <input type="checkbox" name="text_outline" id="text_outline" {% if config.text_outline %}checked{% endif %}>
+                    <span>Contour texte</span>
+                  </label>
+                </div>
+              </div>
+
+              <div class="uc-field uc-inline">
+                <label>Fond dégradé</label>
+                <div class="uc-inline-group">
+                  <label class="uc-inline-checkbox">
+                    <input type="checkbox" name="gradient_bg" id="gradient_bg" {% if config.gradient_bg %}checked{% endif %}>
+                    <span>Activer</span>
+                  </label>
+                </div>
+              </div>
+
+              <div class="uc-field">
+                <label for="gradient_start">Dégradé : couleur 1</label>
+                <input type="color" name="gradient_start" id="gradient_start" value="{{ config.gradient_start or '#eff6ff' }}">
+              </div>
+
+              <div class="uc-field">
+                <label for="gradient_end">Dégradé : couleur 2</label>
+                <input type="color" name="gradient_end" id="gradient_end" value="{{ config.gradient_end or '#dbeafe' }}">
+              </div>
+
+              <div class="uc-field">
+                <label for="stretch_y">
+                  Étirement vertical
+                  <span class="uc-hint">1 = normal</span>
+                </label>
+                <input type="range" min="0.8" max="1.3" step="0.05" name="stretch_y" id="stretch_y" value="{{ config.stretch_y or 1 }}">
+              </div>
+
+              <div class="uc-field">
+                <label for="anim_speed">
+                  Vitesse interne (pour GIF, futur)
+                  <span class="uc-hint">1 = normal</span>
+                </label>
+                <input type="range" min="0.5" max="2" step="0.1" name="anim_speed" id="anim_speed" value="{{ config.anim_speed or 1 }}">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <button type="submit" class="uc-btn-primary">
+          ✨ Générer un nouveau countdown
         </button>
       </form>
-    </div>
+    </section>
 	  
-	  <!-- COLONNE DROITE : APERÇU + LIEN -->
-    <div class="preview-wrapper">
+	  <!-- COLONNE DROITE : PREVIEW & LIEN -->
+    <section class="uc-card uc-preview-card">
+      <h2 class="uc-card-title">Aperçu live</h2>
+      <p class="uc-card-subtitle">
+        Simulation HTML du rendu final. Le GIF généré utilisera ce style (ou la version la plus proche possible).
+      </p>
 
-      <!-- GRAND PREVIEW -->
-      <div class="card">
-        <div class="card-header">
-          <div>
-            <div class="card-title">
-              <div class="card-title-icon">👁️</div>
-              Aperçu détaillé
-            </div>
-            <div class="card-subtitle">
-              Simulation HTML du rendu final. Le GIF généré utilisera ce style (ou le style le plus proche).
-            </div>
-          </div>
-          <span class="badge-small">Live</span>
-        </div>
-        <div id="htmlPreview">Choisis une date pour voir l’aperçu.</div>
-      </div>
-	    
-	    <!-- LIEN GIF -->
-      <div class="card">
-        <div class="card-header">
-          <div>
-            <div class="card-title">
-              <div class="card-title-icon">🔗</div>
-              Lien GIF dynamique
-            </div>
-            <div class="card-subtitle">
-              Utilise ce lien dans tes emails. Chaque ID est permanent et indépendant.
-            </div>
-          </div>
-        </div>
-
-        {% if img_link %}
-          <div class="form-group">
-            <label>URL du GIF</label>
-            <input class="link-input" readonly value="{{ img_link }}" onclick="this.select();">
-            <div class="helper-text">Clique pour sélectionner, puis copie/colle dans ton outil d’emailing.</div>
-          </div>
-
-          <div class="form-group">
-            <label>Code HTML à intégrer</label>
-            <div class="code-block">
-              &lt;img src="{{ img_link }}" alt="Countdown"&gt;
-            </div>
-          </div>
-        {% else %}
-          <div class="helper-text">
-            Configure ton countdown puis clique sur <strong>“Générer un nouveau countdown”</strong> pour obtenir l’URL.
-          </div>
-        {% endif %}
+      <div id="htmlPreview" class="uc-preview-box">
+        Choisis une date pour voir l’aperçu.
       </div>
 
-    </div>
+      <div class="uc-divider"></div>
 
+      <h3 class="uc-card-title uc-card-title-small">Lien GIF dynamique</h3>
+      {% if img_link %}
+        <div class="uc-field">
+          <label>URL du GIF</label>
+          <input class="uc-link-input" readonly value="{{ img_link }}" onclick="this.select();">
+          <p class="uc-helper-text">Clique pour sélectionner, puis copie/colle dans ton outil d’emailing.</p>
+        </div>
+        <div class="uc-field">
+          <label>Code HTML à intégrer</label>
+          <pre class="uc-code">&lt;img src="{{ img_link }}" alt="Countdown"&gt;</pre>
+        </div>
+      {% else %}
+        <p class="uc-helper-text">
+          Configure ton countdown puis clique sur <strong>“Générer un nouveau countdown”</strong> pour obtenir l’URL.
+        </p>
+      {% endif %}
+    </section>
   </div>
 </div>
 
-<!-- JS EXTERNE -->
 <script src="{{ url_for('static', filename='js/settings.js') }}"></script>
 </body>
 </html>
