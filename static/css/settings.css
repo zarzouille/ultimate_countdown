@@ -156,8 +156,74 @@ body {
 .uc-form {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 12px;
     }
+
+.uc-section {
+    margin-bottom: 12px;
+    }
+
+/* TEMPLATE GRID */
+
+.uc-template-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0,1fr));
+    gap: 10px;
+    margin-top: 8px;
+    }
+
+@media (max-width: 640px) {
+    .uc-template-grid {
+        grid-template-columns: minmax(0,1fr);
+        }
+    }
+
+.uc-template-card {
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    padding: 10px 12px;
+    background: #f9fafb;
+    cursor: pointer;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease, transform 0.08s ease;
+    }
+
+.uc-template-card:hover {
+    border-color: #bfdbfe;
+    background: #eff6ff;
+    box-shadow: 0 8px 20px rgba(37,99,235,0.12);
+    transform: translateY(-1px);
+    }
+
+.uc-template-card.uc-template-selected {
+    border-color: var(--accent-strong);
+    background: #eff6ff;
+    box-shadow: 0 10px 28px rgba(37,99,235,0.18);
+    }
+
+.uc-template-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #111827;
+    }
+
+.uc-template-desc {
+    margin: 0;
+    font-size: 12px;
+    color: var(--text-soft2);
+    }
+
+/* DESIGN SECTION */
+
+.uc-section-design {
+    margin-top: 10px;
+    display: none; /* affiché après choix template */
+    }
+
+/* FORM GRID */
 
 .uc-form-grid {
     display: grid;
@@ -286,6 +352,7 @@ input[type="range"] {
     border-radius: 10px;
     border: 1px solid #e5e7eb;
     background-color: #f9fafb;
+    margin-top: 6px;
     }
 
 .uc-acc-header {
@@ -320,10 +387,6 @@ input[type="range"] {
 
 .uc-acc-open {
     display: block;
-    }
-
-.uc-acc-collapsed {
-    display: none;
     }
 
 /* TEMPLATE SECTIONS */
