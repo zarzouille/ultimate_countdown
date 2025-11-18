@@ -226,7 +226,8 @@ def create_countdown():
         config=cfg,
         target_date=target_date_for_input,
         img_link=img_link,
-        countdown_id=countdown_id
+        countdown_id=countdown_id,
+        uuid=uuid.uuid4().hex
     )
 
 @app.route("/settings")

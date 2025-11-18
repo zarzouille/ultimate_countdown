@@ -72,15 +72,13 @@
             </p>
 
             <div class="uc-preview-box">
-                {% if img_link %}
-                    <img
-		                    id="gifPreview"
-		                    src="{{ img_link }}?{{ random() }}"
-		                    alt="Aperçu du GIF">
-                {% else %}
-                    <p>Aucun aperçu encore — choisissez un template et créez votre premier countdown.</p>
-                {% endif %}
-            </div>
+    {% if img_link %}
+        <img id="gifPreview" src="{{ img_link }}?{{ uuid }}" alt="Aperçu du GIF">
+    {% else %}
+        <p>Aucun aperçu encore — choisissez un template et créez votre premier countdown.</p>
+    {% endif %}
+</div>
+
 
             <div class="uc-divider"></div>
 
@@ -108,7 +106,6 @@
 
 <script src="{{ url_for('static', filename='js/settings.js') }}"></script>
 <script>
-  // rafraîchit le GIF si présent
   const form = document.getElementById("countdownForm");
   const previewImg = document.getElementById("gifPreview");
   if (form && previewImg) {
@@ -118,5 +115,6 @@
 	  });
   }
 </script>
+
 </body>
 </html>
