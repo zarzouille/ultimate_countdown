@@ -13,10 +13,10 @@
     <div>
       <div class="uc-logo-row">
         <span class="uc-logo">⏳ Ultimate Countdown</span>
-        <span class="uc-pill">Email-ready • GIF dynamique</span>
+        <span class="uc-pill">Images dynamiques PNG • Email-ready</span>
       </div>
       <p class="uc-subtitle">
-        Choisis un template, personnalise le design, prévisualise en direct et génère un lien GIF unique à intégrer dans tes emails.
+        Choisis un template, personnalise le design, prévisualise en direct et génère un lien d’image à intégrer dans tes emails.
       </p>
     </div>
     <div class="uc-header-actions">
@@ -26,16 +26,16 @@
   </header>
 
   <div class="uc-layout">
-    <!-- COLONNE GAUCHE : FORMULAIRE -->
+    <!-- COLONNE GAUCHE : FORM -->
     <section class="uc-card">
       <h2 class="uc-card-title">Configurer un nouveau countdown</h2>
       <p class="uc-card-subtitle">
-        Chaque enregistrement crée un ID unique. Tu peux générer autant de countdowns que tu veux, indépendamment.
+        Chaque enregistrement crée un ID unique. Tu peux générer autant de countdowns différents que tu veux.
       </p>
 
       <form method="POST" id="configForm" class="uc-form">
 
-        <!-- ACCORDÉON : GÉNÉRAL -->
+        <!-- GÉNÉRAL -->
         <div class="uc-accordion">
           <button type="button" class="uc-acc-header" data-acc-target="section-general">
             <span>⚙️ Paramètres généraux</span>
@@ -46,7 +46,7 @@
               <div class="uc-field uc-field-full">
                 <label for="target_date">
                   Date cible
-                  <span class="uc-hint">Obligatoire</span>
+                  <span class="uc-hint">Clique et choisis jour & heure</span>
                 </label>
                 <input type="datetime-local" name="target_date" id="target_date" value="{{ target_date }}" required>
               </div>
@@ -54,7 +54,7 @@
               <div class="uc-field">
                 <label for="template">
                   Template
-                  <span class="uc-hint">Choisis un style</span>
+                  <span class="uc-hint">Chaque template a ses options</span>
                 </label>
                 <select name="template" id="template">
                   <option value="classic"  {% if config.template == 'classic'  %}selected{% endif %}>Classic</option>
@@ -113,23 +113,14 @@
               </div>
 
               <div class="uc-field">
-                <label for="icon_position">Position de l’icône</label>
-                <select name="icon_position" id="icon_position">
-                  <option value="left"   {% if config.icon_position == 'left'   %}selected{% endif %}>Avant le texte</option>
-	                <option value="right"  {% if config.icon_position == 'right'  %}selected{% endif %}>Après le texte</option>
-	                <option value="above"  {% if config.icon_position == 'above'  %}selected{% endif %}>Au-dessus</option>
-                </select>
-              </div>
-
-              <div class="uc-field">
                 <label for="padding">Padding global (px)</label>
-                <input type="number" name="padding" id="padding" value="{{ config.padding }}" min="0" max="100">
+                <input type="number" name="padding" id="padding" value="{{ config.padding }}" min="0" max="80">
               </div>
             </div>
           </div>
         </div>
 	      
-	      <!-- ACCORDÉON : BLOCS / FLIP / BUBBLE -->
+	      <!-- BLOCS / FLIP / BUBBLE / BADGE -->
         <div class="uc-accordion uc-template-section" data-templates="blocks,flip,bubble,badge">
           <button type="button" class="uc-acc-header" data-acc-target="section-blocks">
             <span>🧱 Options Blocks / Flip / Bubble / Badge</span>
@@ -141,32 +132,18 @@
                 <label for="block_bg_color">Fond blocs</label>
                 <input type="color" name="block_bg_color" id="block_bg_color" value="{{ config.block_bg_color }}">
               </div>
-
               <div class="uc-field">
                 <label for="block_border_color">Contour blocs</label>
                 <input type="color" name="block_border_color" id="block_border_color" value="{{ config.block_border_color }}">
               </div>
-
               <div class="uc-field">
                 <label for="block_border_width">Épaisseur contour</label>
                 <input type="number" name="block_border_width" id="block_border_width" value="{{ config.block_border_width }}" min="0" max="10">
               </div>
-
               <div class="uc-field">
-                <label for="block_radius">Rayon coins</label>
+                <label for="block_radius">Arrondi blocs</label>
                 <input type="number" name="block_radius" id="block_radius" value="{{ config.block_radius }}" min="0" max="60">
               </div>
-
-              <div class="uc-field">
-                <label for="block_padding_x">Padding X blocs</label>
-                <input type="number" name="block_padding_x" id="block_padding_x" value="{{ config.block_padding_x }}" min="0" max="80">
-              </div>
-
-              <div class="uc-field">
-                <label for="block_padding_y">Padding Y blocs</label>
-                <input type="number" name="block_padding_y" id="block_padding_y" value="{{ config.block_padding_y }}" min="0" max="80">
-              </div>
-
               <div class="uc-field">
                 <label for="blocks_gap">Espacement blocs</label>
                 <input type="number" name="blocks_gap" id="blocks_gap" value="{{ config.blocks_gap }}" min="0" max="80">
@@ -175,8 +152,8 @@
           </div>
         </div>
 	      
-	      <!-- ACCORDÉON : LABELS -->
-        <div class="uc-accordion uc-template-section" data-templates="classic,blocks,flip,bubble,minimal,banner,progress,neon,glass,pill,circle,badge">
+	      <!-- LABELS -->
+        <div class="uc-accordion uc-template-section" data-templates="blocks,flip,bubble,classic,badge,progress,circle">
           <button type="button" class="uc-acc-header" data-acc-target="section-labels">
             <span>🔤 Labels J/H/M/S</span>
             <span class="uc-acc-chevron">▾</span>
@@ -187,50 +164,44 @@
                 <label>Labels</label>
                 <div class="uc-inline-group">
                   <label class="uc-inline-checkbox">
-                    <input type="checkbox" name="show_labels" id="show_labels" {% if config.show_labels %}checked{% endif %}>
+                    <input type="checkbox" id="show_labels" name="show_labels" {% if config.show_labels %}checked{% endif %}>
                     <span>Afficher</span>
                   </label>
                   <label class="uc-inline-checkbox">
-                    <input type="checkbox" name="labels_custom" id="labels_custom" {% if config.labels_custom %}checked{% endif %}>
-                    <span>Texte personnalisé</span>
+                    <input type="checkbox" id="labels_custom" name="labels_custom" {% if config.labels_custom %}checked{% endif %}>
+                    <span>Texte perso</span>
                   </label>
                 </div>
               </div>
-
               <div class="uc-field">
                 <label for="label_color">Couleur labels</label>
-                <input type="color" name="label_color" id="label_color" value="{{ config.label_color }}">
+                <input type="color" id="label_color" name="label_color" value="{{ config.label_color }}">
               </div>
-
               <div class="uc-field">
                 <label for="label_size_factor">Taille labels (facteur)</label>
-                <input type="number" step="0.1" min="0.2" max="1.0" name="label_size_factor" id="label_size_factor" value="{{ config.label_size_factor }}">
+                <input type="number" step="0.1" min="0.3" max="1.0" id="label_size_factor" name="label_size_factor" value="{{ config.label_size_factor }}">
               </div>
-
               <div class="uc-field">
                 <label for="label_days">Texte “jours”</label>
-                <input type="text" name="label_days" id="label_days" value="{{ config.labels_personalized.days }}">
+                <input type="text" id="label_days" name="label_days" value="{{ config.labels_personalized.days }}">
               </div>
-
               <div class="uc-field">
                 <label for="label_hours">Texte “heures”</label>
-                <input type="text" name="label_hours" id="label_hours" value="{{ config.labels_personalized.hours }}">
+                <input type="text" id="label_hours" name="label_hours" value="{{ config.labels_personalized.hours }}">
               </div>
-
               <div class="uc-field">
                 <label for="label_minutes">Texte “minutes”</label>
-                <input type="text" name="label_minutes" id="label_minutes" value="{{ config.labels_personalized.minutes }}">
+                <input type="text" id="label_minutes" name="label_minutes" value="{{ config.labels_personalized.minutes }}">
               </div>
-
               <div class="uc-field">
                 <label for="label_seconds">Texte “secondes”</label>
-                <input type="text" name="label_seconds" id="label_seconds" value="{{ config.labels_personalized.seconds }}">
+                <input type="text" id="label_seconds" name="label_seconds" value="{{ config.labels_personalized.seconds }}">
               </div>
             </div>
           </div>
         </div>
 	      
-	      <!-- ACCORDÉON : BANNER -->
+	      <!-- BANNER -->
         <div class="uc-accordion uc-template-section" data-templates="banner">
           <button type="button" class="uc-acc-header" data-acc-target="section-banner">
             <span>📢 Options Banner</span>
@@ -240,18 +211,17 @@
             <div class="uc-form-grid">
               <div class="uc-field">
                 <label for="banner_bg_color">Fond bannière</label>
-                <input type="color" name="banner_bg_color" id="banner_bg_color" value="{{ config.banner_bg_color }}">
+                <input type="color" id="banner_bg_color" name="banner_bg_color" value="{{ config.banner_bg_color }}">
               </div>
-
               <div class="uc-field">
                 <label for="banner_text_color">Texte bannière</label>
-                <input type="color" name="banner_text_color" id="banner_text_color" value="{{ config.banner_text_color }}">
+                <input type="color" id="banner_text_color" name="banner_text_color" value="{{ config.banner_text_color }}">
               </div>
             </div>
           </div>
         </div>
 	      
-	      <!-- ACCORDÉON : PROGRESS -->
+	      <!-- PROGRESS -->
         <div class="uc-accordion uc-template-section" data-templates="progress">
           <button type="button" class="uc-acc-header" data-acc-target="section-progress">
             <span>📊 Options Progress bar</span>
@@ -261,28 +231,25 @@
             <div class="uc-form-grid">
               <div class="uc-field">
                 <label for="progress_bg_color">Fond barre</label>
-                <input type="color" name="progress_bg_color" id="progress_bg_color" value="{{ config.progress_bg_color }}">
+                <input type="color" id="progress_bg_color" name="progress_bg_color" value="{{ config.progress_bg_color }}">
               </div>
-
               <div class="uc-field">
-                <label for="progress_fg_color">Remplissage barre</label>
-                <input type="color" name="progress_fg_color" id="progress_fg_color" value="{{ config.progress_fg_color }}">
+                <label for="progress_fg_color">Remplissage</label>
+                <input type="color" id="progress_fg_color" name="progress_fg_color" value="{{ config.progress_fg_color }}">
               </div>
-
               <div class="uc-field">
-                <label for="progress_height">Hauteur barre (px)</label>
-                <input type="number" name="progress_height" id="progress_height" value="{{ config.progress_height }}" min="4" max="60">
+                <label for="progress_height">Hauteur (px)</label>
+                <input type="number" id="progress_height" name="progress_height" value="{{ config.progress_height }}" min="4" max="60">
               </div>
-
               <div class="uc-field">
                 <label for="progress_max_days">Fenêtre max (jours)</label>
-                <input type="number" name="progress_max_days" id="progress_max_days" value="{{ config.progress_max_days }}" min="1" max="365">
+                <input type="number" id="progress_max_days" name="progress_max_days" value="{{ config.progress_max_days }}" min="1" max="365">
               </div>
             </div>
           </div>
         </div>
 	      
-	      <!-- ACCORDÉON : NEON / GLASS / PILL / CIRCLE / BADGE options spécifiques -->
+	      <!-- SPÉCIAUX (NEON / GLASS / PILL / CIRCLE / BADGE) -->
         <div class="uc-accordion uc-template-section" data-templates="neon,glass,pill,circle,badge">
           <button type="button" class="uc-acc-header" data-acc-target="section-specials">
             <span>✨ Options templates spéciaux</span>
@@ -292,145 +259,66 @@
             <div class="uc-form-grid">
               <div class="uc-field">
                 <label for="neon_glow_color">Couleur glow (Neon)</label>
-                <input type="color" name="neon_glow_color" id="neon_glow_color" value="{{ config.neon_glow_color or '#00f0ff' }}">
+                <input type="color" id="neon_glow_color" name="neon_glow_color" value="{{ config.neon_glow_color or '#00f0ff' }}">
               </div>
-
               <div class="uc-field">
-                <label for="glass_border_color">Contour Glass</label>
-                <input type="color" name="glass_border_color" id="glass_border_color" value="{{ config.glass_border_color or '#d1d5db' }}">
+                <label for="glass_border_color">Contour glass</label>
+                <input type="color" id="glass_border_color" name="glass_border_color" value="{{ config.glass_border_color or '#d1d5db' }}">
               </div>
-
               <div class="uc-field">
-                <label for="glass_bg_tint">Teinte fond Glass</label>
-                <input type="color" name="glass_bg_tint" id="glass_bg_tint" value="{{ config.glass_bg_tint or '#e5f0ff' }}">
+                <label for="glass_bg_tint">Teinte fond glass</label>
+                <input type="color" id="glass_bg_tint" name="glass_bg_tint" value="{{ config.glass_bg_tint or '#e5f0ff' }}">
               </div>
-
               <div class="uc-field">
-                <label for="circle_accent_color">Couleur cercle</label>
-                <input type="color" name="circle_accent_color" id="circle_accent_color" value="{{ config.circle_accent_color or '#3b82f6' }}">
+                <label for="circle_accent_color">Accent cercle</label>
+                <input type="color" id="circle_accent_color" name="circle_accent_color" value="{{ config.circle_accent_color or '#3b82f6' }}">
               </div>
-
               <div class="uc-field">
                 <label for="badge_bg_color">Fond badge</label>
-                <input type="color" name="badge_bg_color" id="badge_bg_color" value="{{ config.badge_bg_color or '#111827' }}">
+                <input type="color" id="badge_bg_color" name="badge_bg_color" value="{{ config.badge_bg_color or '#111827' }}">
               </div>
-
               <div class="uc-field">
                 <label for="badge_accent_color">Accent badge</label>
-                <input type="color" name="badge_accent_color" id="badge_accent_color" value="{{ config.badge_accent_color or '#3b82f6' }}">
+                <input type="color" id="badge_accent_color" name="badge_accent_color" value="{{ config.badge_accent_color or '#3b82f6' }}">
               </div>
             </div>
           </div>
         </div>
 	      
-	      <!-- ACCORDÉON : AVANCÉ -->
+	      <!-- AVANCÉ (SIMPLE, POUR L'INSTANT) -->
         <div class="uc-accordion">
           <button type="button" class="uc-acc-header" data-acc-target="section-advanced">
-            <span>🛠 Options avancées</span>
-            <span class="uc-acc-chip">Expert</span>
+            <span>🛠 Options avancées (preview seulement)</span>
             <span class="uc-acc-chevron">▾</span>
           </button>
           <div id="section-advanced" class="uc-acc-body uc-acc-collapsed">
             <div class="uc-form-grid">
               <div class="uc-field">
-                <label for="blur_amount">
-                  Blur / flou (Glass)
-                  <span class="uc-hint">0 = aucun</span>
-                </label>
-                <input type="range" min="0" max="20" name="blur_amount" id="blur_amount" value="{{ config.blur_amount or 10 }}">
+                <label for="blur_amount">Flou (Glass)</label>
+                <input type="range" min="0" max="20" id="blur_amount" name="blur_amount" value="{{ config.blur_amount or 10 }}">
               </div>
-
               <div class="uc-field uc-inline">
                 <label>Ombres</label>
                 <div class="uc-inline-group">
                   <label class="uc-inline-checkbox">
-                    <input type="checkbox" name="text_shadow" id="text_shadow" {% if config.text_shadow %}checked{% endif %}>
+                    <input type="checkbox" id="text_shadow" name="text_shadow" {% if config.text_shadow %}checked{% endif %}>
                     <span>Texte</span>
                   </label>
                   <label class="uc-inline-checkbox">
-                    <input type="checkbox" name="block_shadow" id="block_shadow" {% if config.block_shadow %}checked{% endif %}>
+                    <input type="checkbox" id="block_shadow" name="block_shadow" {% if config.block_shadow %}checked{% endif %}>
                     <span>Blocs</span>
                   </label>
                 </div>
               </div>
-
-              <div class="uc-field">
-                <label for="border_radius_override">
-                  Rayon global override
-                  <span class="uc-hint">0 = auto</span>
-                </label>
-                <input type="number" name="border_radius_override" id="border_radius_override" value="{{ config.border_radius_override or 0 }}" min="0" max="40">
-              </div>
-
-              <div class="uc-field">
-                <label for="spacing_scale">
-                  Espacements (facteur)
-                  <span class="uc-hint">1 = normal</span>
-                </label>
-                <input type="range" min="0.5" max="2" step="0.1" name="spacing_scale" id="spacing_scale" value="{{ config.spacing_scale or 1 }}">
-              </div>
-
               <div class="uc-field">
                 <label for="rotate_deg">Rotation légère (°)</label>
-                <input type="range" min="-8" max="8" step="1" name="rotate_deg" id="rotate_deg" value="{{ config.rotate_deg or 0 }}">
-              </div>
-
-              <div class="uc-field uc-inline">
-                <label>Styles texte</label>
-                <div class="uc-inline-group">
-                  <label class="uc-inline-checkbox">
-                    <input type="checkbox" name="gradient_text" id="gradient_text" {% if config.gradient_text %}checked{% endif %}>
-                    <span>Texte dégradé</span>
-                  </label>
-                  <label class="uc-inline-checkbox">
-                    <input type="checkbox" name="text_outline" id="text_outline" {% if config.text_outline %}checked{% endif %}>
-                    <span>Contour texte</span>
-                  </label>
-                </div>
-              </div>
-
-              <div class="uc-field uc-inline">
-                <label>Fond dégradé</label>
-                <div class="uc-inline-group">
-                  <label class="uc-inline-checkbox">
-                    <input type="checkbox" name="gradient_bg" id="gradient_bg" {% if config.gradient_bg %}checked{% endif %}>
-                    <span>Activer</span>
-                  </label>
-                </div>
-              </div>
-
-              <div class="uc-field">
-                <label for="gradient_start">Dégradé : couleur 1</label>
-                <input type="color" name="gradient_start" id="gradient_start" value="{{ config.gradient_start or '#eff6ff' }}">
-              </div>
-
-              <div class="uc-field">
-                <label for="gradient_end">Dégradé : couleur 2</label>
-                <input type="color" name="gradient_end" id="gradient_end" value="{{ config.gradient_end or '#dbeafe' }}">
-              </div>
-
-              <div class="uc-field">
-                <label for="stretch_y">
-                  Étirement vertical
-                  <span class="uc-hint">1 = normal</span>
-                </label>
-                <input type="range" min="0.8" max="1.3" step="0.05" name="stretch_y" id="stretch_y" value="{{ config.stretch_y or 1 }}">
-              </div>
-
-              <div class="uc-field">
-                <label for="anim_speed">
-                  Vitesse interne (pour GIF, futur)
-                  <span class="uc-hint">1 = normal</span>
-                </label>
-                <input type="range" min="0.5" max="2" step="0.1" name="anim_speed" id="anim_speed" value="{{ config.anim_speed or 1 }}">
+                <input type="range" min="-8" max="8" step="1" id="rotate_deg" name="rotate_deg" value="{{ config.rotate_deg or 0 }}">
               </div>
             </div>
           </div>
         </div>
 
-        <button type="submit" class="uc-btn-primary">
-          ✨ Générer un nouveau countdown
-        </button>
+        <button type="submit" class="uc-btn-primary">✨ Créer un nouveau countdown</button>
       </form>
     </section>
 	  
@@ -438,7 +326,7 @@
     <section class="uc-card uc-preview-card">
       <h2 class="uc-card-title">Aperçu live</h2>
       <p class="uc-card-subtitle">
-        Simulation HTML du rendu final. Le GIF généré utilisera ce style (ou la version la plus proche possible).
+        Simulation HTML du rendu. L’image générée utilisera ce style (ou la version la plus proche possible côté serveur).
       </p>
 
       <div id="htmlPreview" class="uc-preview-box">
@@ -447,10 +335,10 @@
 
       <div class="uc-divider"></div>
 
-      <h3 class="uc-card-title uc-card-title-small">Lien GIF dynamique</h3>
+      <h3 class="uc-card-title uc-card-title-small">Lien d’image dynamique</h3>
       {% if img_link %}
         <div class="uc-field">
-          <label>URL du GIF</label>
+          <label>URL de l’image</label>
           <input class="uc-link-input" readonly value="{{ img_link }}" onclick="this.select();">
           <p class="uc-helper-text">Clique pour sélectionner, puis copie/colle dans ton outil d’emailing.</p>
         </div>
@@ -460,7 +348,7 @@
         </div>
       {% else %}
         <p class="uc-helper-text">
-          Configure ton countdown puis clique sur <strong>“Générer un nouveau countdown”</strong> pour obtenir l’URL.
+          Configure ton countdown puis clique sur <strong>“Créer un nouveau countdown”</strong> pour obtenir l’URL de l’image.
         </p>
       {% endif %}
     </section>

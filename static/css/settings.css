@@ -10,7 +10,6 @@
     --text-soft2: #9ca3af;
     --radius-lg: 18px;
     --radius-md: 10px;
-    --shadow-soft: 0 18px 40px rgba(15,23,42,0.07);
     --shadow-card: 0 12px 30px rgba(15,23,42,0.06);
     }
 
@@ -32,7 +31,7 @@ body {
     min-height: 100vh;
     }
 
-/* PAGE WRAPPER */
+/* PAGE */
 
 .uc-page {
     max-width: 1220px;
@@ -115,11 +114,11 @@ body {
 
 @media (max-width: 960px) {
     .uc-layout {
-        grid-template-columns: minmax(0, 1fr);
+        grid-template-columns: minmax(0,1fr);
         }
     }
 
-/* CARDS */
+/* CARD */
 
 .uc-card {
     background: var(--bg-card);
@@ -176,10 +175,6 @@ body {
     grid-column: 1 / 3;
     }
 
-.uc-inline {
-    flex-direction: column;
-    }
-
 .uc-inline-group {
     display: flex;
     flex-wrap: wrap;
@@ -192,10 +187,6 @@ body {
     gap: 5px;
     font-size: 12px;
     color: var(--text-soft);
-    }
-
-.uc-inline-checkbox input[type="checkbox"] {
-    transform: translateY(1px);
     }
 
 /* LABELS & INPUTS */
@@ -289,10 +280,10 @@ input[type="range"] {
     filter: brightness(1.03);
     }
 
-/* ACCORDÉONS */
+/* ACCORDIONS */
 
 .uc-accordion {
-    border-radius: var(--radius-md);
+    border-radius: 10px;
     border: 1px solid #e5e7eb;
     background-color: #f9fafb;
     }
@@ -320,16 +311,6 @@ input[type="range"] {
     color: var(--text-soft);
     }
 
-.uc-acc-chip {
-    font-size: 10px;
-    text-transform: uppercase;
-    letter-spacing: 0.07em;
-    padding: 2px 6px;
-    border-radius: 999px;
-    background-color: #e5f2ff;
-    color: #1d4ed8;
-    }
-
 .uc-acc-body {
     border-top: 1px solid #e5e7eb;
     padding: 12px 12px 12px;
@@ -341,12 +322,11 @@ input[type="range"] {
     display: block;
     }
 
-/* pour l’option avancée initialement fermée */
 .uc-acc-collapsed {
     display: none;
     }
 
-/* TEMPLATE SECTIONS (masquées si non concernées) */
+/* TEMPLATE SECTIONS */
 
 .uc-template-section {
     display: none;
@@ -374,17 +354,17 @@ input[type="range"] {
     overflow: hidden;
     }
 
+/* LINK & CODE */
+
 .uc-divider {
     border-top: 1px solid #e5e7eb;
     margin: 16px 0;
     }
 
-/* LINK & CODE */
-
 .uc-link-input {
     width: 100%;
     padding: 7px 10px;
-    border-radius: var(--radius-md);
+    border-radius: 10px;
     border: 1px solid #d1d5db;
     background-color: #f9fafb;
     font-size: 13px;
@@ -400,7 +380,7 @@ input[type="range"] {
 .uc-code {
     margin: 0;
     padding: 8px 10px;
-    border-radius: var(--radius-md);
+    border-radius: 10px;
     border: 1px solid #e5e7eb;
     background: #f3f4f6;
     font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;

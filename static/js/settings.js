@@ -4,7 +4,7 @@ const fontSizeValue = document.getElementById("fontSizeValue");
 const templateSelect = document.getElementById("template");
 const form = document.getElementById("configForm");
 
-/* ---------- Accordéons ---------- */
+/* ========= Accordéons ========= */
 
 document.querySelectorAll(".uc-acc-header").forEach(btn => {
     btn.addEventListener("click", () => {
@@ -12,28 +12,29 @@ document.querySelectorAll(".uc-acc-header").forEach(btn => {
         if (!targetId) return;
         const body = document.getElementById(targetId);
         if (!body) return;
+        const chevron = btn.querySelector(".uc-acc-chevron");
 
         const isOpen = body.classList.contains("uc-acc-open");
         if (isOpen) {
             body.classList.remove("uc-acc-open");
-            btn.querySelector(".uc-acc-chevron").textContent = "▾";
+            if (chevron) chevron.textContent = "▾";
         } else {
             body.classList.add("uc-acc-open");
-            btn.querySelector(".uc-acc-chevron").textContent = "▴";
+            if (chevron) chevron.textContent = "▴";
         }
     });
 });
 
-/* ---------- Affichage des sections selon le template ---------- */
+/* ========= Sections par template ========= */
 
 function updateTemplateSections() {
-    const template = templateSelect.value;
-    const sections = document.querySelectorAll(".uc-template-section");
-
-    sections.forEach(sec => {
-        const templatesAttr = sec.getAttribute("data-templates") || "";
-        const list = templatesAttr.split(",").map(t => t.trim()).filter(Boolean);
-        if (list.includes(template)) {
+    const currentTemplate = templateSelect.value;
+    document.querySelectorAll(".uc-template-section").forEach(sec => {
+        const list = (sec.getAttribute("data-templates") || "")
+            .split(",")
+            .map(t => t.trim())
+            .filter(Boolean);
+        if (list.includes(currentTemplate)) {
             sec.classList.add("uc-template-visible");
         } else {
             sec.classList.remove("uc-template-visible");
@@ -41,14 +42,14 @@ function updateTemplateSections() {
     });
 }
 
-/* ---------- Rendu des templates en preview ---------- */
+/* ========= Rendu templates ========= */
 
-function renderTemplate(template, bg, txt, size, prefix, dateInput) {
-    if (!dateInput) {
+function renderTemplate(template, bg, txt, size, prefix, dateValue) {
+    if (!dateValue) {
         return "Choisis une date pour voir l’aperçu.";
     }
 
-    const target = new Date(dateInput);
+    const target = new Date(dateValue);
     const now = new Date();
     const diff = target - now;
 
@@ -57,7 +58,7 @@ function renderTemplate(template, bg, txt, size, prefix, dateInput) {
     }
 
     if (diff <= 0) {
-        return "⏰ Terminé !";
+        return prefix + "⏰ Terminé !";
     }
 
     const totalSeconds = Math.floor(diff / 1000);
@@ -71,28 +72,20 @@ function renderTemplate(template, bg, txt, size, prefix, dateInput) {
     const labelMinutes = document.getElementById("label_minutes")?.value || "M";
     const labelSeconds = document.getElementById("label_seconds")?.value || "S";
     const showLabels = document.getElementById("show_labels")?.checked;
+
     const blockBg = document.getElementById("block_bg_color")?.value || "#f3f4f6";
     const blockBorder = document.getElementById("block_border_color")?.value || "#e5e7eb";
-    const labelFactor = parseFloat(document.getElementById("label_size_factor")?.value || "0.5");
-    const labelFontSize = size * Math.max(0.3, Math.min(1, labelFactor));
-
     const blockRadius = parseInt(document.getElementById("block_radius")?.value || "12", 10);
-    const blockPadX = parseInt(document.getElementById("block_padding_x")?.value || "14", 10);
-    const blockPadY = parseInt(document.getElementById("block_padding_y")?.value || "8", 10);
     const blocksGap = parseInt(document.getElementById("blocks_gap")?.value || "10", 10);
 
-    const showTextShadow = document.getElementById("text_shadow")?.checked;
-    const showBlockShadow = document.getElementById("block_shadow")?.checked;
-    const blurAmount = parseInt(document.getElementById("blur_amount")?.value || "10", 10);
-    const radiusOverride = parseInt(document.getElementById("border_radius_override")?.value || "0", 10);
-    const spacingScale = parseFloat(document.getElementById("spacing_scale")?.value || "1");
-    const rotateDeg = parseFloat(document.getElementById("rotate_deg")?.value || "0");
-    const gradientBg = document.getElementById("gradient_bg")?.checked;
-    const gradientText = document.getElementById("gradient_text")?.checked;
-    const textOutline = document.getElementById("text_outline")?.checked;
-    const gradientStart = document.getElementById("gradient_start")?.value || "#eff6ff";
-    const gradientEnd = document.getElementById("gradient_end")?.value || "#dbeafe";
-    const stretchY = parseFloat(document.getElementById("stretch_y")?.value || "1");
+    const bannerBg = document.getElementById("banner_bg_color")?.value || "#1d4ed8";
+    const bannerTxt = document.getElementById("banner_text_color")?.value || "#ffffff";
+
+    const progressBg = document.getElementById("progress_bg_color")?.value || "#e5e7eb";
+    const progressFg = document.getElementById("progress_fg_color")?.value || "#3b82f6";
+    const progressHeight = parseInt(document.getElementById("progress_height")?.value || "16", 10);
+    const progressMaxDays = parseInt(document.getElementById("progress_max_days")?.value || "30", 10);
+
     const neonGlowColor = document.getElementById("neon_glow_color")?.value || txt;
     const glassBorder = document.getElementById("glass_border_color")?.value || "#d1d5db";
     const glassTint = document.getElementById("glass_bg_tint")?.value || "#e5f0ff";
@@ -100,53 +93,48 @@ function renderTemplate(template, bg, txt, size, prefix, dateInput) {
     const badgeBg = document.getElementById("badge_bg_color")?.value || "#111827";
     const badgeAccent = document.getElementById("badge_accent_color")?.value || "#3b82f6";
 
-    const baseText = `${prefix}${days}j ${String(hours).padStart(2,"0")}:${String(minutes).padStart(2,"0")}:${String(seconds).padStart(2,"0")}`;
+    const labelFactor = parseFloat(document.getElementById("label_size_factor")?.value || "0.5");
+    const labelFontSize = size * Math.max(0.3, Math.min(1, labelFactor));
 
-    const radiusGlobal = radiusOverride > 0 ? `${radiusOverride}px` : undefined;
-    const gapScaled = blocksGap * spacingScale;
+    const blurAmount = parseInt(document.getElementById("blur_amount")?.value || "10", 10);
+    const textShadowEnabled = document.getElementById("text_shadow")?.checked;
+    const blockShadowEnabled = document.getElementById("block_shadow")?.checked;
+    const rotateDeg = parseFloat(document.getElementById("rotate_deg")?.value || "0");
 
-    const textShadowBase = showTextShadow
-        ? `0 1px 1px rgba(0,0,0,0.18), 0 2px 4px rgba(15,23,42,0.25)`
+    const icon = document.getElementById("icon")?.value || "";
+    const baseTimeText =
+        `${days}j ${String(hours).padStart(2,"0")}:` +
+        `${String(minutes).padStart(2,"0")}:${String(seconds).padStart(2,"0")}`;
+
+    const textShadow = textShadowEnabled
+        ? "0 1px 1px rgba(0,0,0,0.18), 0 2px 4px rgba(15,23,42,0.25)"
+        : "none";
+    const blockShadow = blockShadowEnabled
+        ? "0 10px 25px rgba(15,23,42,0.18)"
         : "none";
 
-    const outlineShadow = textOutline
-        ? `0 0 1px #ffffff, 0 0 2px #ffffff`
-        : "";
+    const wrapperTransform = `transform: rotate(${rotateDeg}deg);`;
 
-    const textShadowCombined = textShadowBase === "none"
-        ? outlineShadow || "none"
-        : (outlineShadow ? `${textShadowBase}, ${outlineShadow}` : textShadowBase);
-
-    const blockShadow = showBlockShadow
-        ? "0 10px 25px rgba(15,23,42,0.15)"
-        : "none";
-
-    const gradientBgStyle = gradientBg
-        ? `background: linear-gradient(135deg, ${gradientStart}, ${gradientEnd});`
-        : `background: ${bg};`;
-
-    const transformWrapper = `transform: rotate(${rotateDeg}deg) scaleY(${stretchY});`;
-
-    const gradientTextStyle = gradientText
-        ? `background: linear-gradient(135deg, ${txt}, ${circleAccent});
-       -webkit-background-clip: text;
-       background-clip: text;
-       color: transparent;`
-        : `color:${txt};`;
-
-    // --------- Templates ----------
+    // ---------- TEMPLATES ----------
 
     if (template === "classic") {
-        const icon = document.getElementById("icon")?.value || "";
-        const line = `${days}j ${String(hours).padStart(2,"0")}:${String(minutes).padStart(2,"0")}:${String(seconds).padStart(2,"0")}`;
+        const line = `${prefix}${baseTimeText}`;
         return `
-      <div style="display:flex;align-items:center;justify-content:center;${transformWrapper}">
-        <div style="padding:${10 * spacingScale}px ${14 * spacingScale}px;border-radius:${radiusGlobal || '999px'};${gradientBgStyle}box-shadow:${blockShadow};">
-          <div style="display:flex;align-items:center;gap:8px;font-size:${size}px;${gradientTextStyle}text-shadow:${textShadowCombined};">
-            ${icon ? `<span>${icon}</span>` : ""}
-            <span>${prefix}</span>
-            <span>${line}</span>
-          </div>
+      <div style="${wrapperTransform}">
+        <div style="
+          display:inline-flex;
+          align-items:center;
+          gap:8px;
+          padding:10px 16px;
+          border-radius:999px;
+          background:${bg};
+          color:${txt};
+          box-shadow:${blockShadow};
+          font-size:${size}px;
+          text-shadow:${textShadow};
+        ">
+          ${icon ? `<span>${icon}</span>` : ""}
+          <span>${line}</span>
         </div>
       </div>
     `;
@@ -157,62 +145,64 @@ function renderTemplate(template, bg, txt, size, prefix, dateInput) {
             [days, labelDays],
             [hours, labelHours],
             [minutes, labelMinutes],
-            [seconds, labelSeconds]
+            [seconds, labelSeconds],
         ];
         return `
-      <div style="display:flex;justify-content:center;gap:${gapScaled}px;${transformWrapper}">
-        ${items.map(([v, label]) => `
-          <div style="
-            padding:${blockPadY * spacingScale}px ${blockPadX * spacingScale}px;
-            border-radius:${radiusGlobal || blockRadius + 'px'};
-            background:${blockBg};
-            border:1px solid ${blockBorder};
-            min-width:60px;
-            text-align:center;
-            box-shadow:${blockShadow};
-          ">
-            <div style="font-size:${size}px;line-height:1.1;${gradientTextStyle}text-shadow:${textShadowCombined};">
-              ${String(v).padStart(2,"0")}
-            </div>
-            ${showLabels
+      <div style="${wrapperTransform}">
+        <div style="display:inline-flex;gap:${blocksGap}px;">
+          ${items.map(([v, label]) => `
+            <div style="
+              padding:10px 14px;
+              border-radius:${blockRadius}px;
+              background:${blockBg};
+              border:1px solid ${blockBorder};
+              min-width:60px;
+              text-align:center;
+              box-shadow:${blockShadow};
+            ">
+              <div style="font-size:${size}px;color:${txt};text-shadow:${textShadow};">
+                ${String(v).padStart(2,"0")}
+              </div>
+              ${showLabels
             ? `<div style="margin-top:4px;font-size:${labelFontSize}px;color:#6b7280;">${label}</div>`
             : ""
         }
-          </div>
-        `).join("")}
+            </div>
+          `).join("")}
+        </div>
       </div>
     `;
     }
 
     if (template === "flip") {
         const flipDigit = (value, label) => `
-      <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
+      <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
         <div style="
           position:relative;
           width:70px;
           height:60px;
-          border-radius:${radiusGlobal || '8px'};
+          border-radius:${blockRadius}px;
           background:#111827;
           color:${txt};
           box-shadow:${blockShadow};
           overflow:hidden;
         ">
           <div style="
-            position:absolute;top:0;left:0;right:0;
-            height:50%;display:flex;align-items:center;justify-content:center;
+            position:absolute;top:0;left:0;right:0;height:50%;
+            display:flex;align-items:center;justify-content:center;
             border-bottom:1px solid rgba(55,65,81,0.9);
             background:#0f172a;
           ">
-            <span style="font-size:${size * 0.9}px;text-shadow:${textShadowCombined};">
+            <span style="font-size:${size * 0.9}px;text-shadow:${textShadow};">
               ${String(value).padStart(2,"0")}
             </span>
           </div>
           <div style="
-            position:absolute;bottom:0;left:0;right:0;
-            height:50%;display:flex;align-items:center;justify-content:center;
+            position:absolute;bottom:0;left:0;right:0;height:50%;
+            display:flex;align-items:center;justify-content:center;
             background:#020617;
           ">
-            <span style="font-size:${size * 0.9}px;text-shadow:${textShadowCombined};">
+            <span style="font-size:${size * 0.9}px;text-shadow:${textShadow};">
               ${String(value).padStart(2,"0")}
             </span>
           </div>
@@ -224,11 +214,13 @@ function renderTemplate(template, bg, txt, size, prefix, dateInput) {
       </div>
     `;
         return `
-      <div style="display:flex;gap:${gapScaled}px;align-items:flex-end;justify-content:center;${transformWrapper}">
-        ${flipDigit(days, labelDays)}
-        ${flipDigit(hours, labelHours)}
-        ${flipDigit(minutes, labelMinutes)}
-        ${flipDigit(seconds, labelSeconds)}
+      <div style="${wrapperTransform}">
+        <div style="display:inline-flex;gap:${blocksGap}px;align-items:flex-end;">
+          ${flipDigit(days, labelDays)}
+          ${flipDigit(hours, labelHours)}
+          ${flipDigit(minutes, labelMinutes)}
+          ${flipDigit(seconds, labelSeconds)}
+        </div>
       </div>
     `;
     }
@@ -236,29 +228,31 @@ function renderTemplate(template, bg, txt, size, prefix, dateInput) {
     if (template === "bubble") {
         const bubble = (value, label) => `
       <div style="
-        padding:${(blockPadY+2) * spacingScale}px ${(blockPadX+4) * spacingScale}px;
-        border-radius:${radiusGlobal || '999px'};
-        background:linear-gradient(135deg, rgba(255,255,255,0.9), rgba(219,234,254,0.95));
-        border:1px solid rgba(148,163,184,0.7);
+        padding:10px 16px;
+        border-radius:999px;
+        background:linear-gradient(135deg, #ffffff, #e5edff);
+        border:1px solid #d1d5db;
         box-shadow:${blockShadow};
-        min-width:64px;
+        min-width:68px;
         text-align:center;
       ">
-        <div style="font-size:${size}px;line-height:1.1;color:#111827;text-shadow:${textShadowCombined};">
+        <div style="font-size:${size}px;color:${txt};text-shadow:${textShadow};">
           ${String(value).padStart(2,"0")}
         </div>
         ${showLabels
-            ? `<div style="margin-top:3px;font-size:${labelFontSize}px;color:#4b5563;">${label}</div>`
+            ? `<div style="margin-top:2px;font-size:${labelFontSize}px;color:#6b7280;">${label}</div>`
             : ""
         }
       </div>
     `;
         return `
-      <div style="display:flex;gap:${gapScaled}px;align-items:center;justify-content:center;${transformWrapper}">
-        ${bubble(days, labelDays)}
-        ${bubble(hours, labelHours)}
-        ${bubble(minutes, labelMinutes)}
-        ${bubble(seconds, labelSeconds)}
+      <div style="${wrapperTransform}">
+        <div style="display:inline-flex;gap:${blocksGap}px;align-items:center;">
+          ${bubble(days, labelDays)}
+          ${bubble(hours, labelHours)}
+          ${bubble(minutes, labelMinutes)}
+          ${bubble(seconds, labelSeconds)}
+        </div>
       </div>
     `;
     }
@@ -270,33 +264,28 @@ function renderTemplate(template, bg, txt, size, prefix, dateInput) {
             `${String(minutes).padStart(2,"0")}:` +
             `${String(seconds).padStart(2,"0")}`;
         return `
-      <div style="${transformWrapper}">
-        <span style="font-size:${size}px;${gradientTextStyle}text-shadow:${textShadowCombined};">
-          ${text}
+      <div style="${wrapperTransform}">
+        <span style="font-size:${size}px;color:${txt};text-shadow:${textShadow};">
+          ${prefix}${text}
         </span>
       </div>
     `;
     }
 
     if (template === "banner") {
-        const bannerBg = document.getElementById("banner_bg_color")?.value || "#1d4ed8";
-        const bannerTxt = document.getElementById("banner_text_color")?.value || "#ffffff";
-        const text =
-            `${prefix}${days} jours ${String(hours).padStart(2,"0")}h ` +
-            `${String(minutes).padStart(2,"0")}m ${String(seconds).padStart(2,"0")}s`;
+        const text = `${prefix}${baseTimeText}`;
         return `
-      <div style="width:100%;${transformWrapper}">
+      <div style="${wrapperTransform}">
         <div style="
-          width:100%;
-          padding:${10 * spacingScale}px ${16 * spacingScale}px;
-          border-radius:${radiusGlobal || '999px'};
+          display:inline-flex;
+          align-items:center;
+          justify-content:center;
+          padding:10px 18px;
+          border-radius:999px;
           background:${bannerBg};
           color:${bannerTxt};
           font-size:${size * 0.6}px;
-          display:flex;
-          align-items:center;
-          justify-content:center;
-          gap:10px;
+          gap:8px;
           box-shadow:${blockShadow};
         ">
           <span>🔔</span>
@@ -307,23 +296,30 @@ function renderTemplate(template, bg, txt, size, prefix, dateInput) {
     }
 
     if (template === "progress") {
-        const maxDays = parseInt(document.getElementById("progress_max_days")?.value || "30", 10);
-        const total = maxDays * 86400;
+        const total = progressMaxDays * 86400;
         let ratio = 1 - (totalSeconds / total);
         ratio = Math.max(0, Math.min(1, ratio));
-        const barBg = document.getElementById("progress_bg_color")?.value || "#e5e7eb";
-        const barFg = document.getElementById("progress_fg_color")?.value || "#3b82f6";
-        const base = `${days}j ${String(hours).padStart(2,"0")}:${String(minutes).padStart(2,"0")}:${String(seconds).padStart(2,"0")}`;
         const percent = (ratio * 100).toFixed(0);
-        const h = parseInt(document.getElementById("progress_height")?.value || "14", 10);
-
         return `
-      <div style="width:100%;max-width:600px;${transformWrapper}">
-        <div style="width:100%;height:${h}px;border-radius:${radiusGlobal || '999px'};background:${barBg};overflow:hidden;">
-          <div style="width:${percent}%;height:100%;background:${barFg};transition:width 0.2s ease;"></div>
-        </div>
-        <div style="margin-top:${8 * spacingScale}px;font-size:${size * 0.6}px;color:#374151;">
-          ${prefix}${base} • ${percent}% écoulé
+      <div style="${wrapperTransform}">
+        <div style="width:100%;max-width:480px;">
+          <div style="
+            width:100%;
+            height:${progressHeight}px;
+            border-radius:999px;
+            background:${progressBg};
+            overflow:hidden;
+          ">
+            <div style="
+              width:${percent}%;
+              height:100%;
+              background:${progressFg};
+              transition:width 0.2s ease;
+            "></div>
+          </div>
+          <div style="margin-top:8px;font-size:${size * 0.6}px;color:#374151;">
+            ${prefix}${baseTimeText} • ${percent}% écoulé
+          </div>
         </div>
       </div>
     `;
@@ -342,15 +338,22 @@ function renderTemplate(template, bg, txt, size, prefix, dateInput) {
       0 0 18px ${neonGlowColor}
     `;
         return `
-      <div style="padding:14px 18px;${transformWrapper}">
+      <div style="${wrapperTransform}">
         <div style="
-          font-size:${size}px;
-          font-weight:600;
-          letter-spacing:0.09em;
-          color:${neonGlowColor};
-          text-shadow:${glow};
+          padding:10px 16px;
+          border-radius:999px;
+          background:#020617;
+          box-shadow:${blockShadow};
         ">
-          ${text}
+          <div style="
+            font-size:${size}px;
+            font-weight:600;
+            letter-spacing:0.08em;
+            color:${neonGlowColor};
+            text-shadow:${glow};
+          ">
+            ${prefix}${text}
+          </div>
         </div>
       </div>
     `;
@@ -358,10 +361,10 @@ function renderTemplate(template, bg, txt, size, prefix, dateInput) {
 
     if (template === "glass") {
         return `
-      <div style="padding:${10 * spacingScale}px;${transformWrapper}">
+      <div style="${wrapperTransform}">
         <div style="
-          padding:${12 * spacingScale}px ${20 * spacingScale}px;
-          border-radius:${radiusGlobal || '18px'};
+          padding:12px 20px;
+          border-radius:18px;
           border:1px solid ${glassBorder};
           background:linear-gradient(135deg, rgba(255,255,255,0.9), ${glassTint});
           box-shadow:${blockShadow};
@@ -370,7 +373,7 @@ function renderTemplate(template, bg, txt, size, prefix, dateInput) {
           font-size:${size * 0.7}px;
           color:#111827;
         ">
-          ${baseText}
+          ${prefix}${baseTimeText}
         </div>
       </div>
     `;
@@ -381,22 +384,21 @@ function renderTemplate(template, bg, txt, size, prefix, dateInput) {
             `${days}j • ${String(hours).padStart(2,"0")}h • ` +
             `${String(minutes).padStart(2,"0")}m • ${String(seconds).padStart(2,"0")}s`;
         return `
-      <div style="padding:${8 * spacingScale}px;${transformWrapper}">
+      <div style="${wrapperTransform}">
         <div style="
           display:inline-flex;
           align-items:center;
-          justify-content:center;
-          padding:${8 * spacingScale}px ${16 * spacingScale}px;
-          border-radius:${radiusGlobal || '999px'};
+          gap:8px;
+          padding:8px 16px;
+          border-radius:999px;
           border:1px solid #d1d5db;
           background:#ffffff;
           box-shadow:${blockShadow};
-          gap:10px;
           font-size:${size * 0.6}px;
           color:#111827;
         ">
-          <span>⏳</span>
-          <span>${line}</span>
+          ${icon ? `<span>${icon}</span>` : "<span>⏳</span>"}
+          <span>${prefix}${line}</span>
         </div>
       </div>
     `;
@@ -409,30 +411,32 @@ function renderTemplate(template, bg, txt, size, prefix, dateInput) {
         ratio = Math.max(0, Math.min(1, ratio));
         const percent = (ratio * 100).toFixed(0);
         return `
-      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;${transformWrapper}">
-        <div style="
-          width:140px;
-          height:140px;
-          border-radius:50%;
-          border:8px solid #e5e7eb;
-          position:relative;
-        ">
+      <div style="${wrapperTransform}">
+        <div style="display:inline-flex;flex-direction:column;align-items:center;gap:8px;">
           <div style="
-            position:absolute;
-            inset:10px;
+            width:140px;
+            height:140px;
             border-radius:50%;
-            background:conic-gradient(${circleAccent} ${percent}%, #e5e7eb ${percent}%);
-            display:flex;
-            align-items:center;
-            justify-content:center;
-            color:#111827;
-            font-size:${size * 0.6}px;
+            border:8px solid #e5e7eb;
+            position:relative;
           ">
-            ${percent}%
+            <div style="
+              position:absolute;
+              inset:10px;
+              border-radius:50%;
+              background:conic-gradient(${circleAccent} ${percent}%, #e5e7eb ${percent}%);
+              display:flex;
+              align-items:center;
+              justify-content:center;
+              color:#111827;
+              font-size:${size * 0.6}px;
+            ">
+              ${percent}%
+            </div>
           </div>
-        </div>
-        <div style="font-size:${size * 0.55}px;color:#374151;">
-          ${days}j ${String(hours).padStart(2,"0")}h ${String(minutes).padStart(2,"0")}m restants
+          <div style="font-size:${size * 0.55}px;color:#374151;">
+            ${prefix}${days}j ${String(hours).padStart(2,"0")}h ${String(minutes).padStart(2,"0")}m
+          </div>
         </div>
       </div>
     `;
@@ -442,21 +446,22 @@ function renderTemplate(template, bg, txt, size, prefix, dateInput) {
         const text =
             `${days}j ${String(hours).padStart(2,"0")}h ${String(minutes).padStart(2,"0")}m`;
         return `
-      <div style="padding:${8 * spacingScale}px;${transformWrapper}">
+      <div style="${wrapperTransform}">
         <div style="
           display:inline-flex;
           flex-direction:column;
           align-items:flex-start;
           gap:4px;
-          padding:${8 * spacingScale}px ${12 * spacingScale}px;
-          border-radius:${radiusGlobal || '12px'};
+          padding:8px 12px;
+          border-radius:12px;
           background:${badgeBg};
           border:1px solid ${badgeAccent};
           box-shadow:${blockShadow};
           color:#f9fafb;
           min-width:160px;
+          font-size:${size * 0.6}px;
         ">
-          <div style="font-size:${size * 0.45}px;color:#9ca3af;">Temps restant</div>
+          <div style="font-size:${size * 0.45}px;color:#9ca3af;">${prefix || "Temps restant :"}</div>
           <div style="font-size:${size * 0.9}px;font-weight:600;">
             ${text}
           </div>
@@ -465,10 +470,14 @@ function renderTemplate(template, bg, txt, size, prefix, dateInput) {
     `;
     }
 
-    return `<span style="font-size:${size}px;">${baseText}</span>`;
+    return `
+    <span style="font-size:${size}px;color:${txt};text-shadow:${textShadow};">
+      ${prefix}${baseTimeText}
+    </span>
+  `;
 }
 
-/* ---------- Update preview ---------- */
+/* ========= Update preview ========= */
 
 function updatePreview() {
     const template = templateSelect.value;
@@ -476,19 +485,29 @@ function updatePreview() {
     const txt = document.getElementById("text_color").value;
     const size = parseInt(fontSizeInput.value || "40", 10);
     const prefix = document.getElementById("message_prefix").value || "Temps restant : ";
-    const dateInput = document.getElementById("target_date").value;
+    const dateValue = document.getElementById("target_date").value;
+    const padding = parseInt(document.getElementById("padding")?.value || "0", 10);
+    const alignment = document.getElementById("alignment").value; // left, center, right
 
     fontSizeValue.textContent = size;
 
-    // Fond du conteneur preview (généraux ou gradient géré dans renderTemplate)
-    htmlPreview.style.background = "#f9fafb";
+    // Styles du conteneur PRÉVIEW
+    htmlPreview.style.backgroundColor = bg;
     htmlPreview.style.color = txt;
+    htmlPreview.style.padding = padding + "px";
+    htmlPreview.style.textAlign = alignment;
 
-    const html = renderTemplate(template, bg, txt, size, prefix, dateInput);
-    htmlPreview.innerHTML = html;
+    const inner = renderTemplate(template, bg, txt, size, prefix, dateValue);
+
+    // On enveloppe toujours dans un inline-block pour que text-align fonctionne
+    htmlPreview.innerHTML = `
+    <div style="display:inline-block;">
+      ${inner}
+    </div>
+  `;
 }
 
-/* ---------- Listeners ---------- */
+/* ========= Listeners ========= */
 
 templateSelect.addEventListener("change", () => {
     updateTemplateSections();
@@ -501,6 +520,6 @@ form.addEventListener("input", () => {
 
 setInterval(updatePreview, 1000);
 
-// Initialisation
+// init
 updateTemplateSections();
 updatePreview();
