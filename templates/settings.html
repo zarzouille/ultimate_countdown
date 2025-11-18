@@ -2,87 +2,121 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Créer un compte à rebours</title>
-    <link rel="stylesheet" href="/static/css/settings.css">
+    <title>{{ config.title or "Ultimate Countdown" }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/settings.css') }}">
 </head>
-
 <body>
 
-<div class="container">
-
-    <h1 class="title">Créer un compte à rebours</h1>
-	
-	<!-- ============================ -->
-	<!-- SECTION 1 — CHOIX DU TEMPLATE -->
-	<!-- ============================ -->
-    <section>
-        <h2>1. Choisissez un template</h2>
-
-        <div class="template-grid" id="templateGrid">
-            <!-- Chaque bouton est un template -->
-            <button class="template-btn" data-template="classic">Classic</button>
-            <button class="template-btn" data-template="blocks">Blocks</button>
-            <button class="template-btn" data-template="flip">Flip</button>
-            <button class="template-btn" data-template="bubble">Bubble</button>
-            <button class="template-btn" data-template="minimal">Minimal</button>
-            <button class="template-btn" data-template="banner">Banner</button>
-            <button class="template-btn" data-template="progress">Progress</button>
+<div class="uc-page">
+    <header class="uc-header">
+        <div>
+            <h1 class="uc-title">Créer un compte à rebours</h1>
+            <p class="uc-subtitle">
+                1) Choisissez un template · 2) Personnalisez le design · 3) Récupérez le lien de l’image.
+            </p>
         </div>
-    </section>
-	
-	
-	<!-- ========================================== -->
-	<!-- SECTION 2 — PARAMÈTRES DYNAMIQUES (MASQUÉS) -->
-	<!-- ========================================== -->
-    <form method="POST" id="countdownForm">
+    </header>
 
-        <input type="hidden" name="template" id="selectedTemplate" value="">
-
-        <div id="templateOptionsContainer"></div>
-	    
-	    
-	    <!-- ======================== -->
-	    <!-- APERCU en temps réel -->
-	    <!-- ======================== -->
-        <section class="preview-section">
-            <h2>Aperçu</h2>
-
-            {% if img_link %}
-                <p class="success">
-                    Votre GIF est prêt : <a href="{{ img_link }}" target="_blank">{{ img_link }}</a>
-                </p>
-            {% endif %}
-
-            <div class="preview-box">
-                {% if countdown_id %}
-                    <img id="gifPreview"
-		                    src="/c/{{countdown_id}}.gif?{{ random() }}"
-		                    alt="Preview">
-                {% else %}
-                    <p>Aucun aperçu encore — choisissez un template.</p>
-                {% endif %}
-            </div>
+    <div class="uc-layout">
+        <!-- COLONNE GAUCHE : CONFIG -->
+        <section class="uc-card">
+            <form method="POST" id="countdownForm">
+                <!-- champ caché pour template -->
+                <input type="hidden" name="template" id="selectedTemplate" value="">
+	            
+	            <!-- TITRE -->
+                <div class="uc-field uc-field-full">
+                    <label for="title">
+                        Titre du countdown
+                        <span class="uc-hint">(utilisé pour le titre de l’onglet)</span>
+                    </label>
+                    <input type="text"
+		                    id="title"
+		                    name="title"
+		                    value="{{ config.title or '' }}"
+		                    placeholder="ex : Lancement V2, Promo Black Friday...">
+                </div>
+	            
+	            <!-- ÉTAPE 1 : CHOIX TEMPLATE -->
+                <section class="uc-section">
+                    <h2 class="uc-section-title">1. Choisissez un template</h2>
+                    <div class="uc-template-grid">
+                        <button type="button" class="uc-template-btn" data-template="classic">Classic</button>
+                        <button type="button" class="uc-template-btn" data-template="blocks">Blocks</button>
+                        <button type="button" class="uc-template-btn" data-template="flip">Flip</button>
+                        <button type="button" class="uc-template-btn" data-template="bubble">Bubble</button>
+                        <button type="button" class="uc-template-btn" data-template="minimal">Minimal</button>
+                        <button type="button" class="uc-template-btn" data-template="banner">Banner</button>
+                        <button type="button" class="uc-template-btn" data-template="progress">Progress</button>
+                    </div>
+                </section>
+	            
+	            <!-- ÉTAPE 2 : OPTIONS DE DESIGN (générées en JS) -->
+                <section class="uc-section" id="designSection" style="display:none;">
+                    <h2 class="uc-section-title">2. Personnalisez le design</h2>
+                    <div id="templateOptionsContainer"></div>
+                </section>
+	            
+	            <!-- SUBMIT -->
+                <button type="submit" class="uc-btn-primary">
+                    ✨ Créer le GIF
+                </button>
+            </form>
         </section>
 	    
-	    <!-- SUBMIT -->
-        <button type="submit" class="submit-btn">Créer le GIF</button>
-    </form>
+	    <!-- COLONNE DROITE : PREVIEW -->
+        <section class="uc-card uc-preview-card">
+            <h2 class="uc-section-title">Aperçu</h2>
+            <p class="uc-subtitle">
+                C’est l’aperçu de votre compte à rebours. L’image servie sur l’URL sera mise à jour dynamiquement.
+            </p>
 
+            <div class="uc-preview-box">
+                {% if img_link %}
+                    <img
+		                    id="gifPreview"
+		                    src="{{ img_link }}?{{ random() }}"
+		                    alt="Aperçu du GIF">
+                {% else %}
+                    <p>Aucun aperçu encore — choisissez un template et créez votre premier countdown.</p>
+                {% endif %}
+            </div>
+
+            <div class="uc-divider"></div>
+
+            <h3 class="uc-section-title uc-small">Lien de l’image dynamique</h3>
+            {% if img_link %}
+                <div class="uc-field">
+                    <label>URL de l’image</label>
+                    <input class="uc-link-input"
+		                    readonly
+		                    value="{{ img_link }}"
+		                    onclick="this.select();">
+                </div>
+                <div class="uc-field">
+                    <label>Code HTML à intégrer</label>
+                    <pre class="uc-code">&lt;img src="{{ img_link }}" alt="Countdown"&gt;</pre>
+                </div>
+            {% else %}
+                <p class="uc-subtitle">
+                    Une fois le GIF créé, tu obtiendras ici l’URL à coller dans ton outil d’emailing.
+                </p>
+            {% endif %}
+        </section>
+    </div>
 </div>
 
-
-<script src="/static/js/settings.js"></script>
+<script src="{{ url_for('static', filename='js/settings.js') }}"></script>
 <script>
-    // Live preview update when form changes
-    const form = document.getElementById("countdownForm");
-    const preview = document.getElementById("gifPreview");
-    
-    if (preview) {
-	    form.addEventListener("input", () => {
-		    preview.src = preview.src.split("?")[0] + "?" + Date.now();
-	    });
-    }
+  // rafraîchit le GIF si présent
+  const form = document.getElementById("countdownForm");
+  const previewImg = document.getElementById("gifPreview");
+  if (form && previewImg) {
+	  form.addEventListener("input", () => {
+		  const base = previewImg.src.split("?")[0];
+		  previewImg.src = base + "?" + Date.now();
+	  });
+  }
 </script>
-
 </body>
 </html>

@@ -1,14 +1,14 @@
-const templateButtons = document.querySelectorAll(".template-btn");
+const templateButtons = document.querySelectorAll(".uc-template-btn");
 const templateContainer = document.getElementById("templateOptionsContainer");
 const hiddenTemplate = document.getElementById("selectedTemplate");
+const designSection = document.getElementById("designSection");
+const titleInput = document.getElementById("title");
 
 let openedTemplate = null;
 
-/* ==========================================
-   OPTIONS PAR TEMPLATE (ce que tu as validé)
-   ========================================== */
+// --------- options par template ----------
 const TEMPLATE_OPTIONS = {
-    classic: ["target_date", "colors", "text", "prefix"],
+    classic: ["target_date", "colors", "text"],
     minimal: ["target_date", "colors", "text"],
     blocks: ["target_date", "colors", "text", "labels", "blocks"],
     flip: ["target_date", "colors", "text", "labels", "blocks"],
@@ -17,158 +17,186 @@ const TEMPLATE_OPTIONS = {
     progress: ["target_date", "colors", "text", "progress"]
 };
 
-/* GLOBAL HTML PARTS */
 const HTML_PARTS = {
-
     target_date: `
-        <label>Date cible</label>
-        <input type="datetime-local" name="target_date">
-    `,
-
+    <div class="uc-field">
+      <label>Date cible</label>
+      <input type="datetime-local" name="target_date">
+    </div>
+  `,
     colors: `
-        <label>Couleur de fond</label>
-        <input type="color" name="background_color" value="#ffffff">
-
-        <label>Couleur du texte</label>
-        <input type="color" name="text_color" value="#000000">
-    `,
-
+    <div class="uc-field">
+      <label>Couleur de fond</label>
+      <input type="color" name="background_color" value="#ffffff">
+    </div>
+    <div class="uc-field">
+      <label>Couleur du texte</label>
+      <input type="color" name="text_color" value="#000000">
+    </div>
+  `,
     text: `
-        <label>Taille du texte</label>
-        <input type="number" name="font_size" min="10" max="120" value="40">
-
-        <label>Préfixe</label>
-        <input type="text" name="message_prefix" placeholder="ex : Temps restant : ">
-    `,
-
+    <div class="uc-field">
+      <label>Taille du texte</label>
+      <input type="number" name="font_size" min="10" max="120" value="40">
+    </div>
+    <div class="uc-field">
+      <label>Préfixe</label>
+      <input type="text" name="message_prefix" placeholder="ex : Temps restant : ">
+    </div>
+  `,
     labels: `
-        <div class="switch">
-            <input type="checkbox" name="show_labels" checked>
-            <label>Afficher les labels (J/H/M/S)</label>
-        </div>
-
-        <div class="switch">
-            <input type="checkbox" name="labels_custom">
-            <label>Labels personnalisés</label>
-        </div>
-
-        <div class="labels-custom-area" style="display:none;">
-            <label>Label jours</label><input type="text" name="label_days" placeholder="Jours">
-            <label>Label heures</label><input type="text" name="label_hours" placeholder="Heures">
-            <label>Label minutes</label><input type="text" name="label_minutes" placeholder="Minutes">
-            <label>Label secondes</label><input type="text" name="label_seconds" placeholder="Secondes">
-        </div>
-
-        <script>
-            document.addEventListener("input", e => {
-                if (e.target.name === "labels_custom") {
-                    document.querySelector(".labels-custom-area").style.display =
-                        e.target.checked ? "block" : "none";
-                }
-            });
-        </script>
-    `,
-
-    /* blocks + flip */
+    <div class="uc-field">
+      <label>
+        <input type="checkbox" name="show_labels" checked>
+        Afficher les labels (J/H/M/S)
+      </label>
+    </div>
+    <div class="uc-field">
+      <label>
+        <input type="checkbox" name="labels_custom">
+        Utiliser des labels personnalisés
+      </label>
+    </div>
+    <div class="uc-field labels-custom" style="display:none;">
+      <label>Label jours</label>
+      <input type="text" name="label_days" placeholder="Jours">
+      <label>Label heures</label>
+      <input type="text" name="label_hours" placeholder="Heures">
+      <label>Label minutes</label>
+      <input type="text" name="label_minutes" placeholder="Minutes">
+      <label>Label secondes</label>
+      <input type="text" name="label_seconds" placeholder="Secondes">
+    </div>
+  `,
     blocks: `
-        <label>Couleur fond blocs</label>
-        <input type="color" name="block_bg_color" value="#ffffff">
-
-        <label>Couleur bordure</label>
-        <input type="color" name="block_border_color" value="#000000">
-
-        <label>Épaisseur bordure</label>
-        <input type="number" name="block_border_width" min="0" value="2">
-
-        <label>Rayon arrondi</label>
-        <input type="number" name="block_radius" min="0" value="12">
-
-        <label>Padding horizontal bloc</label>
-        <input type="number" name="block_padding_x" min="0" value="16">
-
-        <label>Padding vertical bloc</label>
-        <input type="number" name="block_padding_y" min="0" value="8">
-
-        <label>Espacement blocs</label>
-        <input type="number" name="blocks_gap" min="0" value="12">
-    `,
-
-    /* bubble */
+    <div class="uc-field">
+      <label>Couleur fond blocs</label>
+      <input type="color" name="block_bg_color" value="#ffffff">
+    </div>
+    <div class="uc-field">
+      <label>Couleur bordure</label>
+      <input type="color" name="block_border_color" value="#000000">
+    </div>
+    <div class="uc-field">
+      <label>Épaisseur bordure</label>
+      <input type="number" name="block_border_width" value="2" min="0">
+    </div>
+    <div class="uc-field">
+      <label>Rayon arrondi</label>
+      <input type="number" name="block_radius" value="12" min="0">
+    </div>
+    <div class="uc-field">
+      <label>Padding horizontal bloc</label>
+      <input type="number" name="block_padding_x" value="16" min="0">
+    </div>
+    <div class="uc-field">
+      <label>Padding vertical bloc</label>
+      <input type="number" name="block_padding_y" value="8" min="0">
+    </div>
+    <div class="uc-field">
+      <label>Espacement blocs</label>
+      <input type="number" name="blocks_gap" value="12" min="0">
+    </div>
+  `,
     bubble: `
-        <label>Couleur fond cercle</label>
-        <input type="color" name="block_bg_color" value="#ffffff">
-
-        <label>Couleur bordure</label>
-        <input type="color" name="block_border_color" value="#000000">
-
-        <label>Épaisseur bordure cercle</label>
-        <input type="number" name="block_border_width" min="0" value="2">
-
-        <label>Diamètre du cercle (padding vertical)</label>
-        <input type="number" name="block_padding_y" min="0" value="20">
-    `,
-
+    <div class="uc-field">
+      <label>Couleur fond cercle</label>
+      <input type="color" name="block_bg_color" value="#ffffff">
+    </div>
+    <div class="uc-field">
+      <label>Couleur bordure</label>
+      <input type="color" name="block_border_color" value="#000000">
+    </div>
+    <div class="uc-field">
+      <label>Épaisseur bordure cercle</label>
+      <input type="number" name="block_border_width" value="2" min="0">
+    </div>
+    <div class="uc-field">
+      <label>Diamètre du cercle (padding vertical)</label>
+      <input type="number" name="block_padding_y" value="20" min="0">
+    </div>
+  `,
     banner: `
-        <label>Couleur fond bannière</label>
-        <input type="color" name="banner_bg_color" value="#222222">
-
-        <label>Couleur texte</label>
-        <input type="color" name="banner_text_color" value="#ffffff">
-    `,
-
+    <div class="uc-field">
+      <label>Couleur fond bannière</label>
+      <input type="color" name="banner_bg_color" value="#222222">
+    </div>
+    <div class="uc-field">
+      <label>Couleur texte</label>
+      <input type="color" name="banner_text_color" value="#ffffff">
+    </div>
+  `,
     progress: `
-        <label>Couleur fond barre</label>
-        <input type="color" name="progress_bg_color" value="#eeeeee">
-
-        <label>Couleur progression</label>
-        <input type="color" name="progress_fg_color" value="#00aaff">
-
-        <label>Hauteur de la barre</label>
-        <input type="number" name="progress_height" min="4" value="16">
-
-        <label>Durée max progression (jours)</label>
-        <input type="number" name="progress_max_days" min="1" value="30">
-    `
+    <div class="uc-field">
+      <label>Couleur fond barre</label>
+      <input type="color" name="progress_bg_color" value="#eeeeee">
+    </div>
+    <div class="uc-field">
+      <label>Couleur progression</label>
+      <input type="color" name="progress_fg_color" value="#00aaff">
+    </div>
+    <div class="uc-field">
+      <label>Hauteur de la barre</label>
+      <input type="number" name="progress_height" value="16" min="4">
+    </div>
+    <div class="uc-field">
+      <label>Durée max progression (jours)</label>
+      <input type="number" name="progress_max_days" value="30" min="1">
+    </div>
+  `
 };
 
-/* ========================================
-   GÉNÈRE LES OPTIONS POUR UN TEMPLATE
-   ======================================== */
 function buildOptions(templateName) {
-    const opts = TEMPLATE_OPTIONS[templateName];
-    let html = `<div class="options-panel"><h3>Options pour ${templateName}</h3>`;
-
-    opts.forEach(opt => {
-        html += HTML_PARTS[opt];
+    const parts = TEMPLATE_OPTIONS[templateName] || [];
+    let html = "";
+    parts.forEach(key => {
+        html += HTML_PARTS[key] || "";
     });
-
-    html += `</div>`;
     return html;
 }
 
-/* ========================================
-   GESTION DU CLICK TEMPLATE
-   ======================================== */
+// Clic sur un template = toggle
 templateButtons.forEach(btn => {
     btn.addEventListener("click", () => {
-        const name = btn.dataset.template;
+        const tpl = btn.dataset.template;
 
-        if (openedTemplate === name) {
-            // collapse
+        if (openedTemplate === tpl) {
+            // fermer
             openedTemplate = null;
-            templateButtons.forEach(b => b.classList.remove("active"));
-            templateContainer.innerHTML = "";
             hiddenTemplate.value = "";
+            templateButtons.forEach(b => b.classList.remove("uc-selected"));
+            templateContainer.innerHTML = "";
+            if (designSection) designSection.style.display = "none";
             return;
         }
 
-        // update UI
-        openedTemplate = name;
-        hiddenTemplate.value = name;
+        // ouvrir ce template
+        openedTemplate = tpl;
+        hiddenTemplate.value = tpl;
 
-        templateButtons.forEach(b => b.classList.remove("active"));
-        btn.classList.add("active");
+        templateButtons.forEach(b => b.classList.remove("uc-selected"));
+        btn.classList.add("uc-selected");
 
-        templateContainer.innerHTML = buildOptions(name);
+        templateContainer.innerHTML = buildOptions(tpl);
+        if (designSection) designSection.style.display = "block";
+
+        // gestion labels_custom (si présent)
+        const labelsCheckbox = templateContainer.querySelector('input[name="labels_custom"]');
+        const labelsCustomBlock = templateContainer.querySelector(".labels-custom");
+        if (labelsCheckbox && labelsCustomBlock) {
+            labelsCheckbox.addEventListener("change", () => {
+                labelsCustomBlock.style.display = labelsCheckbox.checked ? "block" : "none";
+            });
+        }
     });
 });
+
+// titre de l’onglet mis à jour en live
+if (titleInput) {
+    const updateTitle = () => {
+        const t = titleInput.value.trim();
+        document.title = t || "Ultimate Countdown";
+    };
+    titleInput.addEventListener("input", updateTitle);
+    updateTitle();
+}
