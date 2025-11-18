@@ -22,8 +22,11 @@ from json import JSONDecodeError
 # CONFIG GLOBALE
 # ============================
 DEFAULT_CONFIG = {
+    # Dimensions de l'image
     "width": 600,
     "height": 200,
+
+    # Style générique
     "background_color": "#FFFFFF",
     "text_color": "#000000",
     "font_path": "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
@@ -32,49 +35,68 @@ DEFAULT_CONFIG = {
     "target_date": "2025-12-31T23:59:59",
     "loop_duration": 10,
 
-    # ----- NOUVELLES OPTIONS AVANCÉES -----
-    "template": "classic",                 # classic, blocks, minimal, bubble, flip, banner, progress
+    # Template et layout
+    "template": "classic",      # classic, blocks, flip, bubble, minimal, banner, progress, neon, glass, pill, circle, badge
+    "alignment": "center",      # left, center, right
+    "padding": 20,
+    "spacing": 10,
 
-    "show_labels": True,                   # J / H / M / S
-    "labels_custom": False,                # si True, utilise labels_personalized
+    # Icône
+    "icon": "🕒",
+    "icon_position": "left",    # left, right, above
+
+    # Labels J/H/M/S
+    "show_labels": True,
+    "labels_custom": False,
     "label_color": "#444444",
-    "label_size_factor": 0.5,             # taille labels relative à font_size
+    "label_size_factor": 0.5,
     "labels_personalized": {
-        "days": "Jours",
-        "hours": "Heures",
-        "minutes": "Minutes",
-        "seconds": "Secondes"
+        "days": "J",
+        "hours": "H",
+        "minutes": "M",
+        "seconds": "S",
     },
 
+    # Blocs (blocks, flip, bubble, etc.)
     "block_bg_color": "#FFFFFF",
-    "block_border_color": "#000000",
-    "block_border_width": 2,
+    "block_border_color": "#D1D5DB",
+    "block_border_width": 1,
     "block_radius": 12,
     "block_padding_x": 16,
     "block_padding_y": 8,
     "blocks_gap": 12,
+    "block_shadow": False,
 
-    "alignment": "center",                # left, center, right
-    "padding": 20,
-
-    "icon": "🕒",                         # peut être vide ""
-    "icon_position": "left",              # left, right, above
-
-    # Progress bar options
-    "progress_bg_color": "#EEEEEE",
-    "progress_fg_color": "#00AAFF",
+    # Progress bar
+    "progress_bg_color": "#E5E7EB",
+    "progress_fg_color": "#3B82F6",
     "progress_height": 16,
-    "progress_max_days": 30,              # fenêtre max pour la progression
+    "progress_max_days": 30,
 
     # Banner
-    "banner_bg_color": "#222222",
-    "banner_text_color": "#FFFFFF",
+    "banner_bg_color": "#111827",
+    "banner_text_color": "#F9FAFB",
+
+    # Templates spéciaux (preview HTML)
+    "neon_glow_color": "#00f0ff",
+    "glass_border_color": "#d1d5db",
+    "glass_bg_tint": "#e5f0ff",
+    "circle_accent_color": "#3b82f6",
+    "badge_bg_color": "#111827",
+    "badge_accent_color": "#3b82f6",
+
+    # Effets avancés (preview JS surtout)
+    "blur_amount": 10,
+    "text_shadow": False,
+    "rotate_deg": 0.0,
+
+    # Placeholder, utile si tu veux plus tard enrichir
+    "preview_url": None,
 }
 
 CONFIG_DIR = "configs"                    # dossier où on stocke les JSON de chaque countdown
 ADMIN_PASSWORD = "Doudou2904!!"           # Mot de passe admin
 SECRET_KEY_DEFAULT = "change-me-secret"   # À changer en prod si tu veux
-
 
 # ============================
 # OUTILS UTILITAIRES
@@ -90,7 +112,7 @@ def countdown_path(countdown_id: str) -> str:
 def load_countdown_config(countdown_id: str):
     """
     Charge la config d'un countdown depuis configs/<id>.json.
-    Retourne un dict ou None si introuvable / invalide.
+    Retourne un dict fusionné avec DEFAULT_CONFIG ou None si introuvable / invalide.
     """
     ensure_configs_dir()
     path = countdown_path(countdown_id)
@@ -106,8 +128,17 @@ def load_countdown_config(countdown_id: str):
         print(f"⚠️ Erreur lecture config {countdown_id}.json :", e, file=sys.stderr)
         return None
 
-    cfg = json.loads(json.dumps(DEFAULT_CONFIG))  # deep copy safe
+    # deep copy + merge
+    cfg = json.loads(json.dumps(DEFAULT_CONFIG))
     cfg.update(data)
+    # s'assurer que labels_personalized existe et est complet
+    if "labels_personalized" not in cfg or not isinstance(cfg["labels_personalized"], dict):
+        cfg["labels_personalized"] = json.loads(json.dumps(DEFAULT_CONFIG["labels_personalized"]))
+    else:
+        base_labels = json.loads(json.dumps(DEFAULT_CONFIG["labels_personalized"]))
+        base_labels.update(cfg["labels_personalized"])
+        cfg["labels_personalized"] = base_labels
+
     return cfg
 
 
@@ -205,58 +236,121 @@ def create_countdown():
         # Récupération des valeurs du formulaire
         raw_date = request.form.get("target_date", "").strip()
         if raw_date:
+            # HTML datetime-local : "YYYY-MM-DDTHH:MM"
             if len(raw_date) == 16:
                 raw_date = raw_date + ":00"
             raw_date = raw_date.replace(" ", "T")
             cfg["target_date"] = raw_date
 
+        # Couleurs et texte
         cfg["background_color"] = request.form.get("background_color", cfg["background_color"])
         cfg["text_color"] = request.form.get("text_color", cfg["text_color"])
-        cfg["font_size"] = int(request.form.get("font_size", cfg["font_size"]) or cfg["font_size"])
         cfg["message_prefix"] = request.form.get("message_prefix", cfg["message_prefix"])
+
+        # Font size
+        try:
+            cfg["font_size"] = int(request.form.get("font_size", cfg["font_size"]) or cfg["font_size"])
+        except ValueError:
+            pass
 
         # Template & layout
         cfg["template"] = request.form.get("template", cfg["template"])
         cfg["alignment"] = request.form.get("alignment", cfg["alignment"])
-        cfg["padding"] = int(request.form.get("padding", cfg["padding"]) or cfg["padding"])
+        try:
+            cfg["padding"] = int(request.form.get("padding", cfg["padding"]) or cfg["padding"])
+        except ValueError:
+            pass
+
+        # Icône
+        cfg["icon"] = request.form.get("icon", cfg["icon"])
+        cfg["icon_position"] = request.form.get("icon_position", cfg["icon_position"])
 
         # Labels
         cfg["show_labels"] = (request.form.get("show_labels") == "on")
         cfg["labels_custom"] = (request.form.get("labels_custom") == "on")
         cfg["label_color"] = request.form.get("label_color", cfg["label_color"])
         try:
-            cfg["label_size_factor"] = float(request.form.get("label_size_factor", cfg["label_size_factor"]))
+            cfg["label_size_factor"] = float(
+                request.form.get("label_size_factor", cfg["label_size_factor"])
+            )
         except ValueError:
             pass
 
-        if cfg["labels_custom"]:
-            cfg["labels_personalized"]["days"] = request.form.get("label_days", cfg["labels_personalized"]["days"])
-            cfg["labels_personalized"]["hours"] = request.form.get("label_hours", cfg["labels_personalized"]["hours"])
-            cfg["labels_personalized"]["minutes"] = request.form.get("label_minutes", cfg["labels_personalized"]["minutes"])
-            cfg["labels_personalized"]["seconds"] = request.form.get("label_seconds", cfg["labels_personalized"]["seconds"])
+        if "labels_personalized" not in cfg or not isinstance(cfg["labels_personalized"], dict):
+            cfg["labels_personalized"] = json.loads(json.dumps(DEFAULT_CONFIG["labels_personalized"]))
 
-        # Blocks
+        if cfg["labels_custom"]:
+            cfg["labels_personalized"]["days"] = request.form.get(
+                "label_days", cfg["labels_personalized"]["days"]
+            )
+            cfg["labels_personalized"]["hours"] = request.form.get(
+                "label_hours", cfg["labels_personalized"]["hours"]
+            )
+            cfg["labels_personalized"]["minutes"] = request.form.get(
+                "label_minutes", cfg["labels_personalized"]["minutes"]
+            )
+            cfg["labels_personalized"]["seconds"] = request.form.get(
+                "label_seconds", cfg["labels_personalized"]["seconds"]
+            )
+
+        # Blocks / flip / bubble
         cfg["block_bg_color"] = request.form.get("block_bg_color", cfg["block_bg_color"])
         cfg["block_border_color"] = request.form.get("block_border_color", cfg["block_border_color"])
-        cfg["block_border_width"] = int(request.form.get("block_border_width", cfg["block_border_width"]) or cfg["block_border_width"])
-        cfg["block_radius"] = int(request.form.get("block_radius", cfg["block_radius"]) or cfg["block_radius"])
-        cfg["block_padding_x"] = int(request.form.get("block_padding_x", cfg["block_padding_x"]) or cfg["block_padding_x"])
-        cfg["block_padding_y"] = int(request.form.get("block_padding_y", cfg["block_padding_y"]) or cfg["block_padding_y"])
-        cfg["blocks_gap"] = int(request.form.get("blocks_gap", cfg["blocks_gap"]) or cfg["blocks_gap"])
+        try:
+            cfg["block_border_width"] = int(
+                request.form.get("block_border_width", cfg["block_border_width"])
+                or cfg["block_border_width"]
+            )
+            cfg["block_radius"] = int(
+                request.form.get("block_radius", cfg["block_radius"])
+                or cfg["block_radius"]
+            )
+            cfg["blocks_gap"] = int(
+                request.form.get("blocks_gap", cfg["blocks_gap"])
+                or cfg["blocks_gap"]
+            )
+        except ValueError:
+            pass
 
-        # Icon
-        cfg["icon"] = request.form.get("icon", cfg["icon"])
-        cfg["icon_position"] = request.form.get("icon_position", cfg["icon_position"])
-
-        # Progress
+        # Progress bar
         cfg["progress_bg_color"] = request.form.get("progress_bg_color", cfg["progress_bg_color"])
         cfg["progress_fg_color"] = request.form.get("progress_fg_color", cfg["progress_fg_color"])
-        cfg["progress_height"] = int(request.form.get("progress_height", cfg["progress_height"]) or cfg["progress_height"])
-        cfg["progress_max_days"] = int(request.form.get("progress_max_days", cfg["progress_max_days"]) or cfg["progress_max_days"])
+        try:
+            cfg["progress_height"] = int(
+                request.form.get("progress_height", cfg["progress_height"])
+                or cfg["progress_height"]
+            )
+            cfg["progress_max_days"] = int(
+                request.form.get("progress_max_days", cfg["progress_max_days"])
+                or cfg["progress_max_days"]
+            )
+        except ValueError:
+            pass
 
         # Banner
         cfg["banner_bg_color"] = request.form.get("banner_bg_color", cfg["banner_bg_color"])
         cfg["banner_text_color"] = request.form.get("banner_text_color", cfg["banner_text_color"])
+
+        # Spéciaux (Neon, Glass, Circle, Badge)
+        cfg["neon_glow_color"] = request.form.get("neon_glow_color", cfg["neon_glow_color"])
+        cfg["glass_border_color"] = request.form.get("glass_border_color", cfg["glass_border_color"])
+        cfg["glass_bg_tint"] = request.form.get("glass_bg_tint", cfg["glass_bg_tint"])
+        cfg["circle_accent_color"] = request.form.get("circle_accent_color", cfg["circle_accent_color"])
+        cfg["badge_bg_color"] = request.form.get("badge_bg_color", cfg["badge_bg_color"])
+        cfg["badge_accent_color"] = request.form.get("badge_accent_color", cfg["badge_accent_color"])
+
+        # Effets avancés
+        try:
+            cfg["blur_amount"] = int(request.form.get("blur_amount", cfg["blur_amount"]) or cfg["blur_amount"])
+        except ValueError:
+            pass
+        try:
+            cfg["rotate_deg"] = float(request.form.get("rotate_deg", cfg["rotate_deg"]) or cfg["rotate_deg"])
+        except ValueError:
+            pass
+
+        cfg["text_shadow"] = (request.form.get("text_shadow") == "on")
+        cfg["block_shadow"] = (request.form.get("block_shadow") == "on")
 
         # Génération d'un ID unique
         countdown_id = uuid.uuid4().hex[:8]
@@ -284,6 +378,7 @@ def create_countdown():
 
 @app.route("/settings")
 def redirect_settings():
+    # On redirige simplement vers la page principale (qui est déjà le configurateur)
     return redirect(url_for("create_countdown"))
 
 
@@ -445,7 +540,6 @@ def draw_blocks_like(draw, img, cfg, font, days, hours, minutes, seconds, shape=
     shape: "rect", "flip", "bubble"
     """
     w, h = cfg["width"], cfg["height"]
-    padding = cfg["padding"]
     units = [
         ("days", days),
         ("hours", hours),
@@ -453,12 +547,15 @@ def draw_blocks_like(draw, img, cfg, font, days, hours, minutes, seconds, shape=
         ("seconds", seconds),
     ]
 
-    labels = cfg["labels_personalized"] if cfg.get("labels_custom") else {
-        "days": "J",
-        "hours": "H",
-        "minutes": "M",
-        "seconds": "S",
-    }
+    if cfg.get("labels_custom"):
+        labels = cfg.get("labels_personalized", {})
+    else:
+        labels = {
+            "days": "J",
+            "hours": "H",
+            "minutes": "M",
+            "seconds": "S",
+        }
 
     show_labels = cfg.get("show_labels", True)
     label_color = cfg.get("label_color", "#444444")
@@ -476,7 +573,6 @@ def draw_blocks_like(draw, img, cfg, font, days, hours, minutes, seconds, shape=
     pad_y = cfg["block_padding_y"]
     gap = cfg["blocks_gap"]
 
-    # Mesure des blocs
     blocks_info = []
     for key, value in units:
         txt = f"{value:02}"
@@ -512,7 +608,6 @@ def draw_blocks_like(draw, img, cfg, font, days, hours, minutes, seconds, shape=
     x_start = (w - total_width) // 2
     y_center = h // 2
 
-    # Dessin
     x = x_start
     for b in blocks_info:
         bw = b["bw"]
@@ -521,7 +616,6 @@ def draw_blocks_like(draw, img, cfg, font, days, hours, minutes, seconds, shape=
         bottom = top + bh
 
         if shape == "bubble":
-            # cercle / ellipse
             draw.ellipse(
                 (x, top, x + bw, bottom),
                 fill=block_bg,
@@ -529,7 +623,6 @@ def draw_blocks_like(draw, img, cfg, font, days, hours, minutes, seconds, shape=
                 width=border_w,
             )
         else:
-            # rect / flip
             draw.rounded_rectangle(
                 (x, top, x + bw, bottom),
                 radius=radius,
@@ -541,12 +634,12 @@ def draw_blocks_like(draw, img, cfg, font, days, hours, minutes, seconds, shape=
                 mid = (top + bottom) // 2
                 draw.line((x, mid, x + bw, mid), fill=block_border, width=1)
 
-        # texte principal
+        # Texte principal
         text_x = x + (bw - b["tw"]) // 2
         text_y = top + pad_y
         draw.text((text_x, text_y), b["text"], font=font, fill=cfg["text_color"])
 
-        # label en dessous
+        # Label
         if show_labels:
             label_x = x + (bw - b["lw"]) // 2
             label_y = bottom - pad_y - b["lh"]
@@ -567,7 +660,6 @@ def draw_banner(draw, img, cfg, font, days, hours, minutes, seconds):
     fg = cfg["banner_text_color"]
     prefix = cfg["message_prefix"]
 
-    # fond
     draw.rounded_rectangle(
         (padding, padding, w - padding, h - padding),
         radius=cfg["block_radius"],
@@ -591,7 +683,6 @@ def draw_progress(draw, img, cfg, font, days, hours, minutes, seconds, remaining
     fg = cfg["progress_fg_color"]
     ph = cfg["progress_height"]
 
-    # calcul progression
     if total_initial <= 0:
         ratio = 1.0
     else:
@@ -603,14 +694,12 @@ def draw_progress(draw, img, cfg, font, days, hours, minutes, seconds, remaining
     bar_top = h // 2 - ph // 2
     bar_bottom = bar_top + ph
 
-    # fond de barre
     draw.rounded_rectangle(
         (bar_left, bar_top, bar_right, bar_bottom),
         radius=ph // 2,
         fill=bg,
     )
 
-    # partie remplie
     fill_right = bar_left + int((bar_right - bar_left) * ratio)
     draw.rounded_rectangle(
         (bar_left, bar_top, fill_right, bar_bottom),
@@ -618,7 +707,6 @@ def draw_progress(draw, img, cfg, font, days, hours, minutes, seconds, remaining
         fill=fg,
     )
 
-    # texte dessous
     prefix = cfg.get("message_prefix", "")
     text = f"{prefix}{days}j {hours:02}:{minutes:02}:{seconds:02}"
     bbox = draw.textbbox((0, 0), text, font=font)
@@ -667,7 +755,6 @@ def countdown_image(countdown_id):
             font = ImageFont.load_default()
 
         if remaining <= 0:
-            # Terminé pour tous les templates = simple texte
             draw_center_text(img, draw, cfg, "⏰ Terminé !", font)
         else:
             total_seconds = remaining
