@@ -1,618 +1,88 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <title>Ultimate Countdown – Configuration</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/settings.css') }}">
+    <meta charset="UTF-8">
+    <title>Créer un compte à rebours</title>
+    <link rel="stylesheet" href="/static/settings.css">
 </head>
+
 <body>
 
-<div class="uc-page">
-  <!-- HEADER -->
-  <header class="uc-header">
-    <div>
-      <div class="uc-logo-row">
-        <span class="uc-logo">⏳ Ultimate Countdown</span>
-        <span class="uc-pill">Images dynamiques • Email-ready</span>
-      </div>
-      <p class="uc-subtitle">
-        Étape 1 : choisis un template. Étape 2 : personnalise. Étape 3 : récupère l’URL d’image à coller dans tes emails.
-      </p>
-    </div>
-    <div class="uc-header-actions">
-      <a href="/admin" class="uc-btn-ghost">🔐 Admin</a>
-      <a href="/list" class="uc-btn-ghost">📋 Mes countdowns</a>
-    </div>
-  </header>
+<div class="container">
 
-  <div class="uc-layout">
-    <!-- COLONNE GAUCHE : FORM -->
-    <section class="uc-card">
-      <form method="POST"
-		      id="configForm"
-		      class="uc-form"
-		      data-has-countdown="{% if img_link %}1{% else %}0{% endif %}">
+    <h1 class="title">Créer un compte à rebours</h1>
+	
+	<!-- ============================ -->
+	<!-- SECTION 1 — CHOIX DU TEMPLATE -->
+	<!-- ============================ -->
+    <section>
+        <h2>1. Choisissez un template</h2>
 
-        <!-- ÉTAPE 1 : CHOIX DU TEMPLATE -->
-        <section class="uc-section">
-          <h2 class="uc-card-title">1. Choisir un template</h2>
-          <p class="uc-card-subtitle">
-            Sélectionne d’abord le type de countdown. Les options de design apparaîtront ensuite.
-          </p>
-
-          <input type="hidden" name="template" id="templateInput" value="{{ config.template }}">
-
-          <div class="uc-template-grid">
-            <!-- Classic -->
-            <button type="button"
-		            class="uc-template-card"
-		            data-template="classic">
-              <div class="uc-template-label">Classic</div>
-              <p class="uc-template-desc">Texte simple, propre et universel.</p>
-            </button>
-	          
-	          <!-- Blocks -->
-            <button type="button"
-		            class="uc-template-card"
-		            data-template="blocks">
-              <div class="uc-template-label">Blocks</div>
-              <p class="uc-template-desc">4 blocs pour jours / heures / minutes / secondes.</p>
-            </button>
-	          
-	          <!-- Flip -->
-            <button type="button"
-		            class="uc-template-card"
-		            data-template="flip">
-              <div class="uc-template-label">Flip</div>
-              <p class="uc-template-desc">Style horloge à volets, inspiré des flip clocks.</p>
-            </button>
-	          
-	          <!-- Bubble -->
-            <button type="button"
-		            class="uc-template-card"
-		            data-template="bubble">
-              <div class="uc-template-label">Bubble</div>
-              <p class="uc-template-desc">Pastilles rondes, look badge.</p>
-            </button>
-	          
-	          <!-- Minimal -->
-            <button type="button"
-		            class="uc-template-card"
-		            data-template="minimal">
-              <div class="uc-template-label">Minimal</div>
-              <p class="uc-template-desc">JJ:HH:MM:SS minimaliste sans fioritures.</p>
-            </button>
-	          
-	          <!-- Banner -->
-            <button type="button"
-		            class="uc-template-card"
-		            data-template="banner">
-              <div class="uc-template-label">Banner</div>
-              <p class="uc-template-desc">Bannière arrondie avec message.</p>
-            </button>
-	          
-	          <!-- Progress -->
-            <button type="button"
-		            class="uc-template-card"
-		            data-template="progress">
-              <div class="uc-template-label">Progress</div>
-              <p class="uc-template-desc">Barre de progression + texte restant.</p>
-            </button>
-	          
-	          <!-- Pill -->
-            <button type="button"
-		            class="uc-template-card"
-		            data-template="pill">
-              <div class="uc-template-label">Pill</div>
-              <p class="uc-template-desc">Badge horizontal type “pill”.</p>
-            </button>
-	          
-	          <!-- Circle -->
-            <button type="button"
-		            class="uc-template-card"
-		            data-template="circle">
-              <div class="uc-template-label">Circle</div>
-              <p class="uc-template-desc">Compteur circulaire avec progression.</p>
-            </button>
-	          
-	          <!-- Badge -->
-            <button type="button"
-		            class="uc-template-card"
-		            data-template="badge">
-              <div class="uc-template-label">Badge</div>
-              <p class="uc-template-desc">Étiquette compacte avec temps restant.</p>
-            </button>
-          </div>
-        </section>
-	      
-	      <!-- PANNEAUX D’OPTIONS (cachés tant qu’aucun template choisi) -->
-        <section class="uc-section uc-section-design" id="designSection">
-          <h2 class="uc-card-title">2. Personnaliser le design</h2>
-          <p class="uc-card-subtitle">
-            Les options ci-dessous s’adaptent automatiquement au template sélectionné.
-          </p>
-	        
-	        <!-- GÉNÉRAL -->
-          <div class="uc-accordion">
-            <button type="button" class="uc-acc-header" data-acc-target="section-general">
-              <span>⚙️ Paramètres généraux</span>
-              <span class="uc-acc-chevron">▾</span>
-            </button>
-            <div id="section-general" class="uc-acc-body uc-acc-open">
-              <div class="uc-form-grid">
-                <div class="uc-field uc-field-full">
-                  <label for="target_date">
-                    Date cible
-                    <span class="uc-hint">Clique et choisis jour & heure.</span>
-                  </label>
-                  <input type="datetime-local"
-		                  name="target_date"
-		                  id="target_date"
-		                  value="{{ target_date }}"
-		                  required>
-                </div>
-
-                <div class="uc-field uc-field-full">
-                  <label for="message_prefix">
-                    Préfixe du message
-                    <span class="uc-hint">Ex : “Temps restant : ”</span>
-                  </label>
-                  <input type="text"
-		                  name="message_prefix"
-		                  id="message_prefix"
-		                  value="{{ config.message_prefix }}">
-                </div>
-
-                <div class="uc-field">
-                  <label for="background_color">Couleur de fond</label>
-                  <input type="color"
-		                  name="background_color"
-		                  id="background_color"
-		                  value="{{ config.background_color }}">
-                </div>
-
-                <div class="uc-field">
-                  <label for="text_color">Couleur du texte</label>
-                  <input type="color"
-		                  name="text_color"
-		                  id="text_color"
-		                  value="{{ config.text_color }}">
-                </div>
-
-                <div class="uc-field">
-                  <label for="font_size">Taille du texte</label>
-                  <div class="uc-range-row">
-                    <input type="range"
-		                    min="10"
-		                    max="120"
-		                    name="font_size"
-		                    id="font_size"
-		                    value="{{ config.font_size }}">
-                    <span class="uc-range-value">
-                      <span id="fontSizeValue">{{ config.font_size }}</span> px
-                    </span>
-                  </div>
-                </div>
-
-                <div class="uc-field">
-                  <label for="padding">Padding global (px)</label>
-                  <input type="number"
-		                  name="padding"
-		                  id="padding"
-		                  value="{{ config.padding }}"
-		                  min="0"
-		                  max="80">
-                </div>
-
-                <div class="uc-field">
-                  <label for="icon">
-                    Icône
-                    <span class="uc-hint">Emoji ou symbole optionnel.</span>
-                  </label>
-                  <input type="text"
-		                  name="icon"
-		                  id="icon"
-		                  value="{{ config.icon }}"
-		                  placeholder="ex : ⏳, 🔥, 🎉">
-                </div>
-              </div>
-            </div>
-          </div>
-	        
-	        <!-- LABELS (Blocks / Flip / Bubble / Circle / Badge) -->
-          <div class="uc-accordion uc-template-section"
-		          data-templates="blocks,flip,bubble,circle,badge">
-            <button type="button" class="uc-acc-header" data-acc-target="section-labels">
-              <span>🔤 Labels J/H/M/S</span>
-              <span class="uc-acc-chevron">▾</span>
-            </button>
-            <div id="section-labels" class="uc-acc-body">
-              <div class="uc-form-grid">
-                <div class="uc-field uc-field-full uc-inline">
-                  <label>Labels</label>
-                  <div class="uc-inline-group">
-                    <label class="uc-inline-checkbox">
-                      <input type="checkbox"
-		                      id="show_labels"
-		                      name="show_labels"
-		                      {% if config.show_labels %}checked{% endif %}>
-                      <span>Afficher</span>
-                    </label>
-                    <label class="uc-inline-checkbox">
-                      <input type="checkbox"
-		                      id="labels_custom"
-		                      name="labels_custom"
-		                      {% if config.labels_custom %}checked{% endif %}>
-                      <span>Texte personnalisé</span>
-                    </label>
-                  </div>
-                </div>
-
-                <div class="uc-field">
-                  <label for="label_color">Couleur des labels</label>
-                  <input type="color"
-		                  id="label_color"
-		                  name="label_color"
-		                  value="{{ config.label_color }}">
-                </div>
-
-                <div class="uc-field">
-                  <label for="label_days">Texte pour “Jours”</label>
-                  <input type="text"
-		                  id="label_days"
-		                  name="label_days"
-		                  value="{{ config.labels_personalized.days }}">
-                </div>
-
-                <div class="uc-field">
-                  <label for="label_hours">Texte pour “Heures”</label>
-                  <input type="text"
-		                  id="label_hours"
-		                  name="label_hours"
-		                  value="{{ config.labels_personalized.hours }}">
-                </div>
-
-                <div class="uc-field">
-                  <label for="label_minutes">Texte pour “Minutes”</label>
-                  <input type="text"
-		                  id="label_minutes"
-		                  name="label_minutes"
-		                  value="{{ config.labels_personalized.minutes }}">
-                </div>
-
-                <div class="uc-field">
-                  <label for="label_seconds">Texte pour “Secondes”</label>
-                  <input type="text"
-		                  id="label_seconds"
-		                  name="label_seconds"
-		                  value="{{ config.labels_personalized.seconds }}">
-                </div>
-              </div>
-            </div>
-          </div>
-	        
-	        <!-- BLOCKS / FLIP / BUBBLE -->
-          <div class="uc-accordion uc-template-section"
-		          data-templates="blocks,flip,bubble">
-            <button type="button" class="uc-acc-header" data-acc-target="section-blocks">
-              <span>🧱 Options Blocks / Flip / Bubble</span>
-              <span class="uc-acc-chevron">▾</span>
-            </button>
-            <div id="section-blocks" class="uc-acc-body">
-              <div class="uc-form-grid">
-                <div class="uc-field">
-                  <label for="block_bg_color">Fond des blocs</label>
-                  <input type="color"
-		                  name="block_bg_color"
-		                  id="block_bg_color"
-		                  value="{{ config.block_bg_color }}">
-                </div>
-                <div class="uc-field">
-                  <label for="block_border_color">Contour des blocs</label>
-                  <input type="color"
-		                  name="block_border_color"
-		                  id="block_border_color"
-		                  value="{{ config.block_border_color }}">
-                </div>
-                <div class="uc-field">
-                  <label for="block_border_width">Épaisseur du contour</label>
-                  <input type="number"
-		                  name="block_border_width"
-		                  id="block_border_width"
-		                  value="{{ config.block_border_width }}"
-		                  min="0"
-		                  max="10">
-                </div>
-                <div class="uc-field">
-                  <label for="block_radius">Arrondi blocs</label>
-                  <input type="number"
-		                  name="block_radius"
-		                  id="block_radius"
-		                  value="{{ config.block_radius }}"
-		                  min="0"
-		                  max="60">
-                </div>
-                <div class="uc-field">
-                  <label for="blocks_gap">Espacement blocs</label>
-                  <input type="number"
-		                  name="blocks_gap"
-		                  id="blocks_gap"
-		                  value="{{ config.blocks_gap }}"
-		                  min="0"
-		                  max="80">
-                </div>
-              </div>
-            </div>
-          </div>
-	        
-	        <!-- BUBBLE (épaisseur cercle) -->
-          <div class="uc-accordion uc-template-section"
-		          data-templates="bubble">
-            <button type="button" class="uc-acc-header" data-acc-target="section-bubble">
-              <span>🫧 Options Bubble</span>
-              <span class="uc-acc-chevron">▾</span>
-            </button>
-            <div id="section-bubble" class="uc-acc-body">
-              <div class="uc-form-grid">
-                <div class="uc-field">
-                  <label for="circle_stroke_width">Épaisseur des cercles</label>
-                  <input type="number"
-		                  name="circle_stroke_width"
-		                  id="circle_stroke_width"
-		                  value="{{ config.circle_stroke_width or 4 }}"
-		                  min="1"
-		                  max="20">
-                </div>
-              </div>
-            </div>
-          </div>
-	        
-	        <!-- BANNER -->
-          <div class="uc-accordion uc-template-section"
-		          data-templates="banner">
-            <button type="button" class="uc-acc-header" data-acc-target="section-banner">
-              <span>📢 Options Banner</span>
-              <span class="uc-acc-chevron">▾</span>
-            </button>
-            <div id="section-banner" class="uc-acc-body">
-              <div class="uc-form-grid">
-                <div class="uc-field">
-                  <label for="banner_bg_color">Fond bannière</label>
-                  <input type="color"
-		                  id="banner_bg_color"
-		                  name="banner_bg_color"
-		                  value="{{ config.banner_bg_color }}">
-                </div>
-                <div class="uc-field">
-                  <label for="banner_text_color">Texte bannière</label>
-                  <input type="color"
-		                  id="banner_text_color"
-		                  name="banner_text_color"
-		                  value="{{ config.banner_text_color }}">
-                </div>
-              </div>
-            </div>
-          </div>
-	        
-	        <!-- PROGRESS -->
-          <div class="uc-accordion uc-template-section"
-		          data-templates="progress">
-            <button type="button" class="uc-acc-header" data-acc-target="section-progress">
-              <span>📊 Options Progress bar</span>
-              <span class="uc-acc-chevron">▾</span>
-            </button>
-            <div id="section-progress" class="uc-acc-body">
-              <div class="uc-form-grid">
-                <div class="uc-field">
-                  <label for="progress_bg_color">Fond de la barre</label>
-                  <input type="color"
-		                  id="progress_bg_color"
-		                  name="progress_bg_color"
-		                  value="{{ config.progress_bg_color }}">
-                </div>
-                <div class="uc-field">
-                  <label for="progress_fg_color">Remplissage</label>
-                  <input type="color"
-		                  id="progress_fg_color"
-		                  name="progress_fg_color"
-		                  value="{{ config.progress_fg_color }}">
-                </div>
-                <div class="uc-field">
-                  <label for="progress_height">Hauteur (px)</label>
-                  <input type="number"
-		                  id="progress_height"
-		                  name="progress_height"
-		                  value="{{ config.progress_height }}"
-		                  min="4"
-		                  max="60">
-                </div>
-                <div class="uc-field">
-                  <label for="progress_max_days">Fenêtre max (jours)</label>
-                  <input type="number"
-		                  id="progress_max_days"
-		                  name="progress_max_days"
-		                  value="{{ config.progress_max_days }}"
-		                  min="1"
-		                  max="365">
-                </div>
-              </div>
-            </div>
-          </div>
-	        
-	        <!-- PILL -->
-          <div class="uc-accordion uc-template-section"
-		          data-templates="pill">
-            <button type="button" class="uc-acc-header" data-acc-target="section-pill">
-              <span>💊 Options Pill</span>
-              <span class="uc-acc-chevron">▾</span>
-            </button>
-            <div id="section-pill" class="uc-acc-body">
-              <div class="uc-form-grid">
-                <div class="uc-field">
-                  <label for="pill_bg_color">Fond pill</label>
-                  <input type="color"
-		                  id="pill_bg_color"
-		                  name="pill_bg_color"
-		                  value="{{ config.pill_bg_color or '#ffffff' }}">
-                </div>
-                <div class="uc-field">
-                  <label for="pill_radius">Arrondi pill</label>
-                  <input type="number"
-		                  id="pill_radius"
-		                  name="pill_radius"
-		                  value="{{ config.pill_radius or 999 }}"
-		                  min="0"
-		                  max="999">
-                </div>
-                <div class="uc-field">
-                  <label for="pill_padding_x">Padding horizontal</label>
-                  <input type="number"
-		                  id="pill_padding_x"
-		                  name="pill_padding_x"
-		                  value="{{ config.pill_padding_x or 16 }}"
-		                  min="0"
-		                  max="80">
-                </div>
-                <div class="uc-field">
-                  <label for="pill_padding_y">Padding vertical</label>
-                  <input type="number"
-		                  id="pill_padding_y"
-		                  name="pill_padding_y"
-		                  value="{{ config.pill_padding_y or 8 }}"
-		                  min="0"
-		                  max="40">
-                </div>
-              </div>
-            </div>
-          </div>
-	        
-	        <!-- CIRCLE -->
-          <div class="uc-accordion uc-template-section"
-		          data-templates="circle">
-            <button type="button" class="uc-acc-header" data-acc-target="section-circle">
-              <span>⭕ Options Circle</span>
-              <span class="uc-acc-chevron">▾</span>
-            </button>
-            <div id="section-circle" class="uc-acc-body">
-              <div class="uc-form-grid">
-                <div class="uc-field">
-                  <label for="circle_stroke_width">Épaisseur du cercle</label>
-                  <input type="number"
-		                  id="circle_stroke_width"
-		                  name="circle_stroke_width"
-		                  value="{{ config.circle_stroke_width or 8 }}"
-		                  min="1"
-		                  max="40">
-                </div>
-                <div class="uc-field">
-                  <label for="circle_bg_color">Fond cercle</label>
-                  <input type="color"
-		                  id="circle_bg_color"
-		                  name="circle_bg_color"
-		                  value="{{ config.circle_bg_color or '#e5e7eb' }}">
-                </div>
-                <div class="uc-field">
-                  <label for="circle_fg_color">Accent cercle</label>
-                  <input type="color"
-		                  id="circle_fg_color"
-		                  name="circle_fg_color"
-		                  value="{{ config.circle_fg_color or '#3b82f6' }}">
-                </div>
-              </div>
-            </div>
-          </div>
-	        
-	        <!-- BADGE -->
-          <div class="uc-accordion uc-template-section"
-		          data-templates="badge">
-            <button type="button" class="uc-acc-header" data-acc-target="section-badge">
-              <span>🏷 Options Badge</span>
-              <span class="uc-acc-chevron">▾</span>
-            </button>
-            <div id="section-badge" class="uc-acc-body">
-              <div class="uc-form-grid">
-                <div class="uc-field">
-                  <label for="badge_bg_color">Fond badge</label>
-                  <input type="color"
-		                  id="badge_bg_color"
-		                  name="badge_bg_color"
-		                  value="{{ config.badge_bg_color or '#111827' }}">
-                </div>
-                <div class="uc-field">
-                  <label for="badge_border_color">Contour</label>
-                  <input type="color"
-		                  id="badge_border_color"
-		                  name="badge_border_color"
-		                  value="{{ config.badge_border_color or '#3b82f6' }}">
-                </div>
-                <div class="uc-field">
-                  <label for="badge_border_width">Épaisseur contour</label>
-                  <input type="number"
-		                  id="badge_border_width"
-		                  name="badge_border_width"
-		                  value="{{ config.badge_border_width or 1 }}"
-		                  min="0"
-		                  max="10">
-                </div>
-                <div class="uc-field">
-                  <label for="badge_radius">Arrondi badge</label>
-                  <input type="number"
-		                  id="badge_radius"
-		                  name="badge_radius"
-		                  value="{{ config.badge_radius or 10 }}"
-		                  min="0"
-		                  max="40">
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-	      
-	      <!-- BOUTON CRÉATION -->
-        <button type="submit" class="uc-btn-primary">
-          ✨ Créer un nouveau countdown
-        </button>
-      </form>
-    </section>
-	  
-	  <!-- COLONNE DROITE : PREVIEW & LIEN -->
-    <section class="uc-card uc-preview-card">
-      <h2 class="uc-card-title">Aperçu live</h2>
-      <p class="uc-card-subtitle">
-        Simulation HTML du rendu. L’image générée utilisera ce style (dans la limite de ce que gère le serveur).
-      </p>
-
-      <div id="htmlPreview" class="uc-preview-box">
-        Choisis un template pour commencer.
-      </div>
-
-      <div class="uc-divider"></div>
-
-      <h3 class="uc-card-title uc-card-title-small">Lien d’image dynamique</h3>
-      {% if img_link %}
-        <div class="uc-field">
-          <label>URL de l’image</label>
-          <input class="uc-link-input"
-		          readonly
-		          value="{{ img_link }}"
-		          onclick="this.select();">
-          <p class="uc-helper-text">
-            Clique pour sélectionner, puis copie/colle dans ton outil d’emailing.
-          </p>
+        <div class="template-grid" id="templateGrid">
+            <!-- Chaque bouton est un template -->
+            <button class="template-btn" data-template="classic">Classic</button>
+            <button class="template-btn" data-template="blocks">Blocks</button>
+            <button class="template-btn" data-template="flip">Flip</button>
+            <button class="template-btn" data-template="bubble">Bubble</button>
+            <button class="template-btn" data-template="minimal">Minimal</button>
+            <button class="template-btn" data-template="banner">Banner</button>
+            <button class="template-btn" data-template="progress">Progress</button>
         </div>
-        <div class="uc-field">
-          <label>Code HTML à intégrer</label>
-          <pre class="uc-code">&lt;img src="{{ img_link }}" alt="Countdown"&gt;</pre>
-        </div>
-      {% else %}
-        <p class="uc-helper-text">
-          Une fois le countdown créé, tu obtiendras ici l’URL d’image à intégrer dans tes emails.
-        </p>
-      {% endif %}
     </section>
-  </div>
+	
+	
+	<!-- ========================================== -->
+	<!-- SECTION 2 — PARAMÈTRES DYNAMIQUES (MASQUÉS) -->
+	<!-- ========================================== -->
+    <form method="POST" id="countdownForm">
+
+        <input type="hidden" name="template" id="selectedTemplate" value="">
+
+        <div id="templateOptionsContainer"></div>
+	    
+	    
+	    <!-- ======================== -->
+	    <!-- APERCU en temps réel -->
+	    <!-- ======================== -->
+        <section class="preview-section">
+            <h2>Aperçu</h2>
+
+            {% if img_link %}
+                <p class="success">
+                    Votre GIF est prêt : <a href="{{ img_link }}" target="_blank">{{ img_link }}</a>
+                </p>
+            {% endif %}
+
+            <div class="preview-box">
+                {% if countdown_id %}
+                    <img id="gifPreview"
+		                    src="/c/{{countdown_id}}.gif?{{ random() }}"
+		                    alt="Preview">
+                {% else %}
+                    <p>Aucun aperçu encore — choisissez un template.</p>
+                {% endif %}
+            </div>
+        </section>
+	    
+	    <!-- SUBMIT -->
+        <button type="submit" class="submit-btn">Créer le GIF</button>
+    </form>
+
 </div>
 
-<script src="{{ url_for('static', filename='js/settings.js') }}"></script>
+
+<script src="/static/settings.js"></script>
+<script>
+    // Live preview update when form changes
+    const form = document.getElementById("countdownForm");
+    const preview = document.getElementById("gifPreview");
+    
+    if (preview) {
+	    form.addEventListener("input", () => {
+		    preview.src = preview.src.split("?")[0] + "?" + Date.now();
+	    });
+    }
+</script>
+
 </body>
 </html>
