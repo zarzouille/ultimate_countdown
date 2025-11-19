@@ -2,119 +2,259 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>{{ config.title or "Ultimate Countdown" }}</title>
+    <title>Ultimate Countdown</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/settings.css') }}">
 </head>
 <body>
-
-<div class="uc-page">
-    <header class="uc-header">
+<div class="page">
+    <header class="header">
         <div>
-            <h1 class="uc-title">Créer un compte à rebours</h1>
-            <p class="uc-subtitle">
-                1) Choisissez un template · 2) Personnalisez le design · 3) Récupérez le lien de l’image.
-            </p>
+            <h1>Ultimate Countdown</h1>
+            <p>Crée un compte à rebours GIF à intégrer dans tes emails.</p>
         </div>
     </header>
 
-    <div class="uc-layout">
-        <!-- COLONNE GAUCHE : CONFIG -->
-        <section class="uc-card">
+    <main class="layout">
+        <!-- COLONNE GAUCHE : FORMULAIRE -->
+        <section class="card">
             <form method="POST" id="countdownForm">
-                <!-- champ caché pour template -->
-                <input type="hidden" name="template" id="selectedTemplate" value="">
-	            
-	            <!-- TITRE -->
-                <div class="uc-field uc-field-full">
-                    <label for="title">
-                        Titre du countdown
-                        <span class="uc-hint">(utilisé pour le titre de l’onglet)</span>
-                    </label>
-                    <input type="text"
-		                    id="title"
-		                    name="title"
-		                    value="{{ config.title or '' }}"
-		                    placeholder="ex : Lancement V2, Promo Black Friday...">
+
+                <!-- Choix du template -->
+                <div class="section">
+                    <h2>1. Choisis un template</h2>
+                    <input type="hidden" name="template" id="selectedTemplate" value="{{ config.template }}">
+
+                    <div class="template-grid">
+                        <button type="button"
+		                        class="template-btn"
+		                        data-template="basic">
+                            Basic
+                        </button>
+                        <button type="button"
+		                        class="template-btn"
+		                        data-template="circular">
+                            Circular
+                        </button>
+                    </div>
                 </div>
 	            
-	            <!-- ÉTAPE 1 : CHOIX TEMPLATE -->
-                <section class="uc-section">
-                    <h2 class="uc-section-title">1. Choisissez un template</h2>
-                    <div class="uc-template-grid">
-                        <button type="button" class="uc-template-btn" data-template="classic">Classic</button>
-                        <button type="button" class="uc-template-btn" data-template="blocks">Blocks</button>
-                        <button type="button" class="uc-template-btn" data-template="flip">Flip</button>
-                        <button type="button" class="uc-template-btn" data-template="bubble">Bubble</button>
-                        <button type="button" class="uc-template-btn" data-template="minimal">Minimal</button>
-                        <button type="button" class="uc-template-btn" data-template="banner">Banner</button>
-                        <button type="button" class="uc-template-btn" data-template="progress">Progress</button>
+	            <!-- Options communes -->
+                <div class="section">
+                    <h2>2. Paramètres généraux</h2>
+
+                    <div class="field">
+                        <label for="target_date">Date cible</label>
+                        <input type="datetime-local"
+		                        id="target_date"
+		                        name="target_date"
+		                        value="{{ target_date }}">
                     </div>
-                </section>
+
+                    <div class="field">
+                        <label for="message_prefix">Préfixe du message</label>
+                        <input type="text"
+		                        id="message_prefix"
+		                        name="message_prefix"
+		                        value="{{ config.message_prefix }}">
+                    </div>
+
+                    <div class="field-row">
+                        <div class="field">
+                            <label for="background_color">Couleur de fond</label>
+                            <input type="color"
+		                            id="background_color"
+		                            name="background_color"
+		                            value="{{ config.background_color }}">
+                        </div>
+                        <div class="field">
+                            <label for="text_color">Couleur du texte</label>
+                            <input type="color"
+		                            id="text_color"
+		                            name="text_color"
+		                            value="{{ config.text_color }}">
+                        </div>
+                    </div>
+
+                    <div class="field-row">
+                        <div class="field">
+                            <label for="font_size">Taille texte (px)</label>
+                            <input type="number"
+		                            id="font_size"
+		                            name="font_size"
+		                            min="10" max="72"
+		                            value="{{ config.font_size }}">
+                        </div>
+                        <div class="field checkbox-field">
+                            <label>
+                                <input type="checkbox"
+		                                name="show_labels"
+		                                {% if config.show_labels %}checked{% endif %}>
+                                Afficher les labels (J / H / M / S)
+                            </label>
+                        </div>
+                    </div>
+                </div>
 	            
-	            <!-- ÉTAPE 2 : OPTIONS DE DESIGN (générées en JS) -->
-                <section class="uc-section" id="designSection" style="display:none;">
-                    <h2 class="uc-section-title">2. Personnalisez le design</h2>
-                    <div id="templateOptionsContainer"></div>
-                </section>
+	            <!-- Options template BASIC -->
+                <div class="section template-options" id="options-basic">
+                    <h2>3. Options template Basic</h2>
+
+                    <div class="field-row">
+                        <div class="field">
+                            <label for="basic_label_color">Couleur des labels</label>
+                            <input type="color"
+		                            id="basic_label_color"
+		                            name="basic_label_color"
+		                            value="{{ config.basic_label_color }}">
+                        </div>
+                        <div class="field">
+                            <label for="basic_label_size">Taille des labels (px)</label>
+                            <input type="number"
+		                            id="basic_label_size"
+		                            name="basic_label_size"
+		                            min="8" max="24"
+		                            value="{{ config.basic_label_size }}">
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label for="basic_gap">Espacement nombre–label (px)</label>
+                        <input type="number"
+		                        id="basic_gap"
+		                        name="basic_gap"
+		                        min="0" max="40"
+		                        value="{{ config.basic_gap }}">
+                    </div>
+                </div>
 	            
-	            <!-- SUBMIT -->
-                <button type="submit" class="uc-btn-primary">
-                    ✨ Créer le GIF
+	            <!-- Options template CIRCULAR -->
+                <div class="section template-options" id="options-circular">
+                    <h2>3. Options template Circular</h2>
+
+                    <div class="field-row">
+                        <div class="field">
+                            <label for="circular_base_color">Couleur cercle de base</label>
+                            <input type="color"
+		                            id="circular_base_color"
+		                            name="circular_base_color"
+		                            value="{{ config.circular_base_color }}">
+                        </div>
+                        <div class="field">
+                            <label for="circular_progress_color">Couleur de progression</label>
+                            <input type="color"
+		                            id="circular_progress_color"
+		                            name="circular_progress_color"
+		                            value="{{ config.circular_progress_color }}">
+                        </div>
+                    </div>
+
+                    <div class="field-row">
+                        <div class="field">
+                            <label for="circular_thickness">Épaisseur du cercle (px)</label>
+                            <input type="number"
+		                            id="circular_thickness"
+		                            name="circular_thickness"
+		                            min="1" max="20"
+		                            value="{{ config.circular_thickness }}">
+                        </div>
+                        <div class="field checkbox-field">
+                            <label>
+                                <input type="checkbox"
+		                                name="circular_label_uppercase"
+		                                {% if config.circular_label_uppercase %}checked{% endif %}>
+                                Labels en majuscules
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="field-row">
+                        <div class="field">
+                            <label for="circular_label_size">Taille des labels (px)</label>
+                            <input type="number"
+		                            id="circular_label_size"
+		                            name="circular_label_size"
+		                            min="8" max="24"
+		                            value="{{ config.circular_label_size }}">
+                        </div>
+                        <div class="field">
+                            <label for="circular_label_color">Couleur des labels</label>
+                            <input type="color"
+		                            id="circular_label_color"
+		                            name="circular_label_color"
+		                            value="{{ config.circular_label_color }}">
+                        </div>
+                    </div>
+
+                    <div class="field-row">
+                        <div class="field">
+                            <label for="circular_spacing">Espacement entre cercles (px)</label>
+                            <input type="number"
+		                            id="circular_spacing"
+		                            name="circular_spacing"
+		                            min="0" max="40"
+		                            value="{{ config.circular_spacing }}">
+                        </div>
+                        <div class="field">
+                            <label for="circular_inner_ratio">Rayon intérieur (0–0.95)</label>
+                            <input type="number"
+		                            step="0.05"
+		                            id="circular_inner_ratio"
+		                            name="circular_inner_ratio"
+		                            min="0.1" max="0.95"
+		                            value="{{ config.circular_inner_ratio }}">
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="primary-btn">
+                    Générer le GIF
                 </button>
             </form>
         </section>
 	    
-	    <!-- COLONNE DROITE : PREVIEW -->
-        <section class="uc-card uc-preview-card">
-            <h2 class="uc-section-title">Aperçu</h2>
-            <p class="uc-subtitle">
-                C’est l’aperçu de votre compte à rebours. L’image servie sur l’URL sera mise à jour dynamiquement.
+	    <!-- COLONNE DROITE : APERÇU -->
+        <section class="card preview-card">
+            <h2>Aperçu</h2>
+            <p class="hint">
+                Le GIF généré ci-dessous sera exactement celui utilisé dans ton email.
             </p>
 
-            <div class="uc-preview-box">
-    {% if img_link %}
-        <img id="gifPreview" src="{{ img_link }}?{{ uuid }}" alt="Aperçu du GIF">
-    {% else %}
-        <p>Aucun aperçu encore — choisissez un template et créez votre premier countdown.</p>
-    {% endif %}
-</div>
+            <div class="preview-box">
+                {% if img_link %}
+                    <img id="gifPreview"
+		                    src="{{ img_link }}"
+		                    data-base="{{ img_link }}"
+		                    alt="Aperçu du GIF">
+                {% else %}
+                    <p class="empty-preview">
+                        Aucun GIF généré pour l’instant. Configure ton countdown puis clique sur <strong>Générer le GIF</strong>.
+                    </p>
+                {% endif %}
+            </div>
 
+            <div class="divider"></div>
 
-            <div class="uc-divider"></div>
-
-            <h3 class="uc-section-title uc-small">Lien de l’image dynamique</h3>
+            <h3>URL de l’image dynamique</h3>
             {% if img_link %}
-                <div class="uc-field">
-                    <label>URL de l’image</label>
-                    <input class="uc-link-input"
+                <div class="field">
+                    <input class="link-input"
 		                    readonly
 		                    value="{{ img_link }}"
 		                    onclick="this.select();">
                 </div>
-                <div class="uc-field">
-                    <label>Code HTML à intégrer</label>
-                    <pre class="uc-code">&lt;img src="{{ img_link }}" alt="Countdown"&gt;</pre>
-                </div>
+                <p class="hint">
+                    Tu peux la coller directement dans un &lt;img&gt; :<br>
+                    <code>&lt;img src="{{ img_link }}" alt="Countdown"&gt;</code>
+                </p>
             {% else %}
-                <p class="uc-subtitle">
-                    Une fois le GIF créé, tu obtiendras ici l’URL à coller dans ton outil d’emailing.
+                <p class="hint">
+                    Une fois le GIF généré, tu verras ici le lien direct à utiliser.
                 </p>
             {% endif %}
         </section>
-    </div>
+    </main>
 </div>
 
 <script src="{{ url_for('static', filename='js/settings.js') }}"></script>
-<script>
-  const form = document.getElementById("countdownForm");
-  const previewImg = document.getElementById("gifPreview");
-  if (form && previewImg) {
-	  form.addEventListener("input", () => {
-		  const base = previewImg.src.split("?")[0];
-		  previewImg.src = base + "?" + Date.now();
-	  });
-  }
-</script>
-
 </body>
 </html>
