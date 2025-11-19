@@ -15,26 +15,17 @@
     </header>
 
     <main class="layout">
-        <!-- COLONNE GAUCHE : FORMULAIRE -->
+        <!-- Colonne gauche : formulaire -->
         <section class="card">
             <form method="POST" id="countdownForm">
-
-                <!-- Choix du template -->
+                <!-- Template -->
                 <div class="section">
                     <h2>1. Choisis un template</h2>
-                    <input type="hidden" name="template" id="selectedTemplate" value="{{ config.template }}">
+                    <input type="hidden" name="template" id="selectedTemplate" value="{{ config.template }}"/>
 
                     <div class="template-grid">
-                        <button type="button"
-		                        class="template-btn"
-		                        data-template="basic">
-                            Basic
-                        </button>
-                        <button type="button"
-		                        class="template-btn"
-		                        data-template="circular">
-                            Circular
-                        </button>
+                        <button type="button" class="template-btn" data-template="basic">Basic</button>
+                        <button type="button" class="template-btn" data-template="circular">Circular</button>
                     </div>
                 </div>
 	            
@@ -44,124 +35,83 @@
 
                     <div class="field">
                         <label for="target_date">Date cible</label>
-                        <input type="datetime-local"
-		                        id="target_date"
-		                        name="target_date"
-		                        value="{{ target_date }}">
+                        <input type="datetime-local" id="target_date" name="target_date" value="{{ target_date }}">
                     </div>
 
                     <div class="field">
                         <label for="message_prefix">Préfixe du message</label>
-                        <input type="text"
-		                        id="message_prefix"
-		                        name="message_prefix"
-		                        value="{{ config.message_prefix }}">
+                        <input type="text" id="message_prefix" name="message_prefix" value="{{ config.message_prefix }}">
                     </div>
 
                     <div class="field-row">
                         <div class="field">
                             <label for="background_color">Couleur de fond</label>
-                            <input type="color"
-		                            id="background_color"
-		                            name="background_color"
-		                            value="{{ config.background_color }}">
+                            <input type="color" id="background_color" name="background_color" value="{{ config.background_color }}">
                         </div>
                         <div class="field">
                             <label for="text_color">Couleur du texte</label>
-                            <input type="color"
-		                            id="text_color"
-		                            name="text_color"
-		                            value="{{ config.text_color }}">
+                            <input type="color" id="text_color" name="text_color" value="{{ config.text_color }}">
                         </div>
                     </div>
 
                     <div class="field-row">
                         <div class="field">
-                            <label for="font_size">Taille texte (px)</label>
-                            <input type="number"
-		                            id="font_size"
-		                            name="font_size"
-		                            min="10" max="72"
-		                            value="{{ config.font_size }}">
+                            <label for="font_size">Taille du texte (px)</label>
+                            <input type="number" id="font_size" name="font_size" min="10" max="72" value="{{ config.font_size }}">
                         </div>
                         <div class="field checkbox-field">
                             <label>
-                                <input type="checkbox"
-		                                name="show_labels"
-		                                {% if config.show_labels %}checked{% endif %}>
+                                <input type="checkbox" name="show_labels" {% if config.show_labels %}checked{% endif %}>
                                 Afficher les labels (J / H / M / S)
                             </label>
                         </div>
                     </div>
                 </div>
 	            
-	            <!-- Options template BASIC -->
+	            <!-- Options BASIC -->
                 <div class="section template-options" id="options-basic">
-                    <h2>3. Options template Basic</h2>
+                    <h2>3. Options Basic</h2>
 
                     <div class="field-row">
                         <div class="field">
                             <label for="basic_label_color">Couleur des labels</label>
-                            <input type="color"
-		                            id="basic_label_color"
-		                            name="basic_label_color"
-		                            value="{{ config.basic_label_color }}">
+                            <input type="color" id="basic_label_color" name="basic_label_color" value="{{ config.basic_label_color }}">
                         </div>
                         <div class="field">
                             <label for="basic_label_size">Taille des labels (px)</label>
-                            <input type="number"
-		                            id="basic_label_size"
-		                            name="basic_label_size"
-		                            min="8" max="24"
-		                            value="{{ config.basic_label_size }}">
+                            <input type="number" id="basic_label_size" name="basic_label_size" min="8" max="24" value="{{ config.basic_label_size }}">
                         </div>
                     </div>
 
                     <div class="field">
                         <label for="basic_gap">Espacement nombre–label (px)</label>
-                        <input type="number"
-		                        id="basic_gap"
-		                        name="basic_gap"
-		                        min="0" max="40"
-		                        value="{{ config.basic_gap }}">
+                        <input type="number" id="basic_gap" name="basic_gap" min="0" max="40" value="{{ config.basic_gap }}">
                     </div>
                 </div>
 	            
-	            <!-- Options template CIRCULAR -->
+	            <!-- Options CIRCULAR -->
                 <div class="section template-options" id="options-circular">
-                    <h2>3. Options template Circular</h2>
+                    <h2>3. Options Circular</h2>
 
                     <div class="field-row">
                         <div class="field">
                             <label for="circular_base_color">Couleur cercle de base</label>
-                            <input type="color"
-		                            id="circular_base_color"
-		                            name="circular_base_color"
-		                            value="{{ config.circular_base_color }}">
+                            <input type="color" id="circular_base_color" name="circular_base_color" value="{{ config.circular_base_color }}">
                         </div>
                         <div class="field">
                             <label for="circular_progress_color">Couleur de progression</label>
-                            <input type="color"
-		                            id="circular_progress_color"
-		                            name="circular_progress_color"
-		                            value="{{ config.circular_progress_color }}">
+                            <input type="color" id="circular_progress_color" name="circular_progress_color" value="{{ config.circular_progress_color }}">
                         </div>
                     </div>
 
                     <div class="field-row">
                         <div class="field">
                             <label for="circular_thickness">Épaisseur du cercle (px)</label>
-                            <input type="number"
-		                            id="circular_thickness"
-		                            name="circular_thickness"
-		                            min="1" max="20"
-		                            value="{{ config.circular_thickness }}">
+                            <input type="number" id="circular_thickness" name="circular_thickness" min="1" max="20" value="{{ config.circular_thickness }}">
                         </div>
                         <div class="field checkbox-field">
                             <label>
-                                <input type="checkbox"
-		                                name="circular_label_uppercase"
-		                                {% if config.circular_label_uppercase %}checked{% endif %}>
+                                <input type="checkbox" name="circular_label_uppercase" {% if config.circular_label_uppercase %}checked{% endif %}>
                                 Labels en majuscules
                             </label>
                         </div>
@@ -170,86 +120,53 @@
                     <div class="field-row">
                         <div class="field">
                             <label for="circular_label_size">Taille des labels (px)</label>
-                            <input type="number"
-		                            id="circular_label_size"
-		                            name="circular_label_size"
-		                            min="8" max="24"
-		                            value="{{ config.circular_label_size }}">
+                            <input type="number" id="circular_label_size" name="circular_label_size" min="8" max="24" value="{{ config.circular_label_size }}">
                         </div>
                         <div class="field">
                             <label for="circular_label_color">Couleur des labels</label>
-                            <input type="color"
-		                            id="circular_label_color"
-		                            name="circular_label_color"
-		                            value="{{ config.circular_label_color }}">
+                            <input type="color" id="circular_label_color" name="circular_label_color" value="{{ config.circular_label_color }}">
                         </div>
                     </div>
 
                     <div class="field-row">
                         <div class="field">
                             <label for="circular_spacing">Espacement entre cercles (px)</label>
-                            <input type="number"
-		                            id="circular_spacing"
-		                            name="circular_spacing"
-		                            min="0" max="40"
-		                            value="{{ config.circular_spacing }}">
+                            <input type="number" id="circular_spacing" name="circular_spacing" min="0" max="40" value="{{ config.circular_spacing }}">
                         </div>
                         <div class="field">
                             <label for="circular_inner_ratio">Rayon intérieur (0–0.95)</label>
-                            <input type="number"
-		                            step="0.05"
-		                            id="circular_inner_ratio"
-		                            name="circular_inner_ratio"
-		                            min="0.1" max="0.95"
-		                            value="{{ config.circular_inner_ratio }}">
+                            <input type="number" step="0.05" id="circular_inner_ratio" name="circular_inner_ratio" min="0.1" max="0.95" value="{{ config.circular_inner_ratio }}">
                         </div>
                     </div>
                 </div>
 
-                <button type="submit" class="primary-btn">
-                    Générer le GIF
-                </button>
+                <button type="submit" class="primary-btn">Générer le GIF</button>
             </form>
         </section>
 	    
-	    <!-- COLONNE DROITE : APERÇU -->
+	    <!-- Colonne droite : preview + lien GIF -->
         <section class="card preview-card">
-            <h2>Aperçu</h2>
-            <p class="hint">
-                Le GIF généré ci-dessous sera exactement celui utilisé dans ton email.
-            </p>
+            <h2>Aperçu live</h2>
+            <p class="hint">L’aperçu utilise un SVG live qui reflète le rendu visuel du GIF final.</p>
 
             <div class="preview-box">
-                {% if img_link %}
-                    <img id="gifPreview"
-		                    src="{{ img_link }}"
-		                    data-base="{{ img_link }}"
-		                    alt="Aperçu du GIF">
-                {% else %}
-                    <p class="empty-preview">
-                        Aucun GIF généré pour l’instant. Configure ton countdown puis clique sur <strong>Générer le GIF</strong>.
-                    </p>
-                {% endif %}
+                <img id="previewImage" alt="Aperçu" src="{{ url_for('preview_svg') }}">
             </div>
 
             <div class="divider"></div>
 
-            <h3>URL de l’image dynamique</h3>
+            <h2>GIF final</h2>
             {% if img_link %}
+                <p class="hint">GIF généré :</p>
                 <div class="field">
-                    <input class="link-input"
-		                    readonly
-		                    value="{{ img_link }}"
-		                    onclick="this.select();">
+                    <input class="link-input" readonly value="{{ img_link }}" onclick="this.select();">
                 </div>
                 <p class="hint">
-                    Tu peux la coller directement dans un &lt;img&gt; :<br>
+                    Exemple HTML :<br>
                     <code>&lt;img src="{{ img_link }}" alt="Countdown"&gt;</code>
                 </p>
             {% else %}
-                <p class="hint">
-                    Une fois le GIF généré, tu verras ici le lien direct à utiliser.
-                </p>
+                <p class="hint">Une fois le GIF généré, le lien direct apparaîtra ici.</p>
             {% endif %}
         </section>
     </main>

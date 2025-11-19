@@ -4,15 +4,13 @@ document.addEventListener("DOMContentLoaded", () => {
     const optionsBasic = document.getElementById("options-basic");
     const optionsCircular = document.getElementById("options-circular");
     const form = document.getElementById("countdownForm");
-    const gifPreview = document.getElementById("gifPreview");
+    const previewImage = document.getElementById("previewImage");
 
     function updateTemplateUI(template) {
-        // boutons
         templateButtons.forEach(btn => {
             btn.classList.toggle("selected", btn.dataset.template === template);
         });
 
-        // options spécifiques
         if (template === "basic") {
             optionsBasic.classList.add("active");
             optionsCircular.classList.remove("active");
@@ -25,17 +23,34 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // init à partir de la config côté serveur
+    function buildPreviewUrl() {
+        if (!previewImage || !form) return;
+
+        const formData = new FormData(form);
+        const params = new URLSearchParams();
+
+        for (const [key, value] of formData.entries()) {
+            if (key === "show_labels" || key === "circular_label_uppercase") {
+                // checkbox -> bool
+                params.set(key, "1");
+            } else if (value !== "") {
+                params.set(key, value);
+            }
+        }
+
+        const base = "/preview.svg";
+        previewImage.src = base + "?" + params.toString() + "&t=" + Date.now();
+    }
+
+    // Init template UI
     if (hiddenTemplate && hiddenTemplate.value) {
         updateTemplateUI(hiddenTemplate.value);
     }
 
-    // click sur template
+    // Click sur les templates
     templateButtons.forEach(btn => {
         btn.addEventListener("click", () => {
             const tpl = btn.dataset.template;
-
-            // toggle : si on reclique sur le même -> on désélectionne
             if (hiddenTemplate.value === tpl) {
                 hiddenTemplate.value = "";
                 updateTemplateUI("");
@@ -43,19 +58,19 @@ document.addEventListener("DOMContentLoaded", () => {
                 hiddenTemplate.value = tpl;
                 updateTemplateUI(tpl);
             }
-
-            // si GIF déjà généré, rafraîchir l'aperçu
-            if (gifPreview && gifPreview.dataset.base) {
-                gifPreview.src = gifPreview.dataset.base + "?t=" + Date.now();
-            }
+            buildPreviewUrl();
         });
     });
 
-    // rafraîchissement du GIF quand on change un champ
-    if (form && gifPreview && gifPreview.dataset.base) {
+    // Live preview sur changement de champ
+    if (form) {
         form.addEventListener("input", () => {
-            const base = gifPreview.dataset.base;
-            gifPreview.src = base + "?t=" + Date.now();
+            buildPreviewUrl();
         });
+    }
+
+    // Premier rendu
+    if (previewImage) {
+        buildPreviewUrl();
     }
 });
