@@ -41,38 +41,31 @@ document.addEventListener("DOMContentLoaded", () => {
         previewImage.src = base + "?" + params.toString() + "&t=" + Date.now();
     }
 
-    // Initialisation du template sélectionné
+    // Initial template
     if (hiddenTemplate && hiddenTemplate.value) {
         updateTemplateUI(hiddenTemplate.value);
     } else {
-        // Par défaut : circular
         hiddenTemplate.value = "circular";
         updateTemplateUI("circular");
     }
 
-    // Click sur un template
+    // Template clicks
     templateButtons.forEach(btn => {
         btn.addEventListener("click", () => {
             const tpl = btn.dataset.template;
-            if (hiddenTemplate.value === tpl) {
-                // re-cliquer sur le même -> désélection possible si tu veux
-                // pour l'instant on le garde sélectionné
-                hiddenTemplate.value = tpl;
-            } else {
-                hiddenTemplate.value = tpl;
-            }
+            hiddenTemplate.value = tpl;
             updateTemplateUI(tpl);
             buildPreviewUrl();
         });
     });
 
-    // Mise à jour live
+    // Live preview on change
     if (form) {
         form.addEventListener("input", () => {
             buildPreviewUrl();
         });
     }
 
-    // Premier rendu
+    // First render
     buildPreviewUrl();
 });
