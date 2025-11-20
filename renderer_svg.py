@@ -16,11 +16,13 @@ def _esc(s: str) -> str:
 def svg_preview(cfg: dict) -> str:
     """
     Génère le SVG d'aperçu pour la config donnée.
+    Le layout du template 'circular' est calqué sur celui du GIF
+    pour éviter les différences de spacing / taille.
     """
     w = cfg["width"]
     h = cfg["height"]
 
-    # Calcul du temps restant
+    # --- Temps restant ---
     try:
         end = datetime.fromisoformat(cfg["target_date"])
     except Exception:
@@ -43,34 +45,43 @@ def svg_preview(cfg: dict) -> str:
 
     units = [("J", days), ("H", hours), ("M", minutes), ("S", seconds)]
 
-    # En-tête SVG
+    # --- En-tête SVG ---
     svg = [
         f'<svg xmlns="http://www.w3.org/2000/svg" width="{w}" height="{h}" viewBox="0 0 {w} {h}">',
         f'<rect width="100%" height="100%" fill="{bg}"/>'
     ]
 
-    # Préfixe
+    # Préfixe centré en haut
     if prefix:
         svg.append(
             f'<text x="{w/2}" y="26" text-anchor="middle" '
             f'font-family="system-ui, -apple-system, sans-serif" '
-            f'font-size="14" fill="{text_color}">{_esc(prefix)}</text>'
+            f'font-size="18" font-weight="500" fill="{text_color}">{_esc(prefix)}</text>'
         )
 
-    # === TEMPLATE CIRCULAR ===
+    # ===================================================================
+    # TEMPLATE CIRCULAR  (aligné avec renderer_gif._draw_circular_frame)
+    # ===================================================================
     if template == "circular":
-        radius = 32
         spacing = cfg["circular_spacing"]
-        total_width = 4 * (radius * 2) + 3 * spacing
-        start_x = (w - total_width) / 2
-        cy = h / 2 + 8
-
         base_color = cfg["circular_base_color"]
         progress_color = cfg["circular_progress_color"]
         label_color = cfg["circular_label_color"]
         label_size = cfg["circular_label_size"]
         uppercase = cfg["circular_label_uppercase"]
+        thickness = cfg["circular_thickness"]
 
+        # même logique que dans le GIF (sans SCALE)
+        padding = 40
+        available_w = w - padding * 2
+        count = 4
+        radius = int((available_w - (count - 1) * spacing) / (count * 2))
+        radius = max(radius, 20)
+
+        # position verticale
+        center_y = h / 2 + 4
+
+        # ratios de progression
         max_days = 30
         days_ratio = min(days / max_days, 1.0) if max_days > 0 else 1.0
         hours_ratio = hours / 24 if hours >= 0 else 0
@@ -78,30 +89,33 @@ def svg_preview(cfg: dict) -> str:
         seconds_ratio = seconds / 60 if seconds >= 0 else 0
         ratios = [days_ratio, hours_ratio, minutes_ratio, seconds_ratio]
 
+        total_width = count * (2 * radius) + (count - 1) * spacing
+        start_x = (w - total_width) / 2
+
         for i, ((label, val), ratio) in enumerate(zip(units, ratios)):
             cx = start_x + radius + i * (2 * radius + spacing)
-            cy_local = cy
+            cy = center_y
 
             # cercle de base
             svg.append(
-                f'<circle cx="{cx}" cy="{cy_local}" r="{radius}" '
-                f'stroke="{base_color}" stroke-width="{cfg["circular_thickness"]}" '
+                f'<circle cx="{cx}" cy="{cy}" r="{radius}" '
+                f'stroke="{base_color}" stroke-width="{thickness}" '
                 f'fill="none"/>'
             )
 
-            # progression
+            # progression (stroke-dasharray)
             circ = 2 * math.pi * radius
             dash = max(0.0, min(ratio, 1.0)) * circ
             svg.append(
-                f'<circle cx="{cx}" cy="{cy_local}" r="{radius}" '
-                f'stroke="{progress_color}" stroke-width="{cfg["circular_thickness"]}" '
+                f'<circle cx="{cx}" cy="{cy}" r="{radius}" '
+                f'stroke="{progress_color}" stroke-width="{thickness}" '
                 f'fill="none" stroke-dasharray="{dash} {circ - dash}" '
-                f'transform="rotate(-90 {cx} {cy_local})"/>'
+                f'transform="rotate(-90 {cx} {cy})"/>'
             )
 
-            # valeur
+            # valeur numérique
             svg.append(
-                f'<text x="{cx}" y="{cy_local+4}" text-anchor="middle" '
+                f'<text x="{cx}" y="{cy+4}" text-anchor="middle" '
                 f'font-size="{cfg["font_size"]}" '
                 f'font-family="system-ui, -apple-system, sans-serif" '
                 f'fill="{text_color}" dominant-baseline="middle">{val:02d}</text>'
@@ -111,7 +125,7 @@ def svg_preview(cfg: dict) -> str:
             if show_labels:
                 lbl = label.upper() if uppercase else label
                 svg.append(
-                    f'<text x="{cx}" y="{cy_local+radius+14}" text-anchor="middle" '
+                    f'<text x="{cx}" y="{cy + radius + 16}" text-anchor="middle" '
                     f'font-size="{label_size}" '
                     f'font-family="system-ui, -apple-system, sans-serif" '
                     f'fill="{label_color}">{lbl}</text>'
@@ -120,7 +134,9 @@ def svg_preview(cfg: dict) -> str:
         svg.append("</svg>")
         return "\n".join(svg)
 
-    # === TEMPLATE BASIC ===
+    # ===================================================================
+    # TEMPLATE BASIC (inchangé)
+    # ===================================================================
     main_size = cfg["font_size"]
     label_size = cfg["basic_label_size"]
     gap = cfg["basic_gap"]
