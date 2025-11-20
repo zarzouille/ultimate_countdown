@@ -31,7 +31,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
         for (const [key, value] of formData.entries()) {
             if (key === "show_labels" || key === "circular_label_uppercase") {
-                // checkbox -> bool
                 params.set(key, "1");
             } else if (value !== "") {
                 params.set(key, value);
@@ -42,27 +41,32 @@ document.addEventListener("DOMContentLoaded", () => {
         previewImage.src = base + "?" + params.toString() + "&t=" + Date.now();
     }
 
-    // Init template UI
+    // Initialisation du template sélectionné
     if (hiddenTemplate && hiddenTemplate.value) {
         updateTemplateUI(hiddenTemplate.value);
+    } else {
+        // Par défaut : circular
+        hiddenTemplate.value = "circular";
+        updateTemplateUI("circular");
     }
 
-    // Click sur les templates
+    // Click sur un template
     templateButtons.forEach(btn => {
         btn.addEventListener("click", () => {
             const tpl = btn.dataset.template;
             if (hiddenTemplate.value === tpl) {
-                hiddenTemplate.value = "";
-                updateTemplateUI("");
+                // re-cliquer sur le même -> désélection possible si tu veux
+                // pour l'instant on le garde sélectionné
+                hiddenTemplate.value = tpl;
             } else {
                 hiddenTemplate.value = tpl;
-                updateTemplateUI(tpl);
             }
+            updateTemplateUI(tpl);
             buildPreviewUrl();
         });
     });
 
-    // Live preview sur changement de champ
+    // Mise à jour live
     if (form) {
         form.addEventListener("input", () => {
             buildPreviewUrl();
@@ -70,7 +74,5 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // Premier rendu
-    if (previewImage) {
-        buildPreviewUrl();
-    }
+    buildPreviewUrl();
 });
