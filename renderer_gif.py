@@ -169,17 +169,15 @@ def _draw_circular_frame(draw, cfg, days, hours, minutes, seconds):
             width=thickness,
         )
 
-        # valeur (FIX CENTRAGE)
+        # valeur (CENTRAGE PARFAIT)
         num_txt = f"{value:02}"
         bbox = draw.textbbox((0, 0), num_txt, font=font_main)
         tw = bbox[2] - bbox[0]
         th = bbox[3] - bbox[1]
-
-        text_x = cx - tw / 2
-        text_y = cy - th * 0.56  # compensation baseline SVG → Pillow
+        offset = bbox[1]  # ascender offset
 
         draw.text(
-            (text_x, text_y),
+            (cx - tw / 2, cy - th / 2 - offset),
             num_txt,
             font=font_main,
             fill=cfg["text_color"],
