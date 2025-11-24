@@ -121,7 +121,6 @@ def _draw_circular_frame(draw, cfg, days, hours, minutes, seconds):
     units = [("J", days, 30), ("H", hours, 24),
              ("M", minutes, 60), ("S", seconds, 60)]
 
-    # calcul rayon
     padding = 40 * SCALE
     available_w = W - padding * 2
     count = 4
@@ -170,11 +169,17 @@ def _draw_circular_frame(draw, cfg, days, hours, minutes, seconds):
             width=thickness,
         )
 
-        # valeur
+        # valeur (FIX CENTRAGE)
         num_txt = f"{value:02}"
-        tw, th = _text_size(draw, num_txt, font_main)
+        bbox = draw.textbbox((0, 0), num_txt, font=font_main)
+        tw = bbox[2] - bbox[0]
+        th = bbox[3] - bbox[1]
+
+        text_x = cx - tw / 2
+        text_y = cy - th * 0.56  # compensation baseline SVG → Pillow
+
         draw.text(
-            (cx - tw // 2, cy - th // 2),
+            (text_x, text_y),
             num_txt,
             font=font_main,
             fill=cfg["text_color"],
@@ -197,10 +202,6 @@ def _draw_circular_frame(draw, cfg, days, hours, minutes, seconds):
 # ============================
 
 def generate_gif(cfg: dict, end_time: datetime) -> BytesIO:
-    """
-    Génère un GIF à partir de la config + date de fin.
-    Supersampling x4 + réduction LANCZOS.
-    """
     now = datetime.utcnow()
     loop_duration = int(cfg.get("loop_duration", 20))
 
@@ -238,7 +239,6 @@ def generate_gif(cfg: dict, end_time: datetime) -> BytesIO:
             else:
                 _draw_basic_frame(draw, cfg, days, hours, minutes, seconds)
 
-        # downscale pour un rendu net
         final = big.resize((cfg["width"], cfg["height"]), Image.LANCZOS)
         frames.append(final)
 
