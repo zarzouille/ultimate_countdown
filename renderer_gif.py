@@ -1,197 +1,212 @@
-import math
 from datetime import datetime, timedelta
+from io import BytesIO
+
+from PIL import Image, ImageDraw, ImageFont
 
 
-def _esc(s: str) -> str:
-    if s is None:
-        return ""
-    return (
-        str(s)
-        .replace("&", "&amp;")
-        .replace("<", "&lt;")
-        .replace(">", "&gt;")
-    )
+FONT_PATH = "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"
+SCALE = 4  # supersampling x4
 
 
-def svg_preview(cfg: dict) -> str:
-    """
-    Génère le SVG d'aperçu pour la config donnée.
-    Le layout du template 'circular' est calqué sur celui du GIF,
-    y compris la compensation de baseline utilisée dans Pillow.
-    """
-    w = cfg["width"]
-    h = cfg["height"]
-
-    # --- Temps restant ---
+def _load_font(px_size: int):
     try:
-        end = datetime.fromisoformat(cfg["target_date"])
+        return ImageFont.truetype(FONT_PATH, px_size)
     except Exception:
-        end = datetime.utcnow() + timedelta(days=3)
+        return ImageFont.load_default()
 
-    now = datetime.utcnow()
-    remaining = int((end - now).total_seconds())
-    if remaining <= 0:
-        days = hours = minutes = seconds = 0
-    else:
-        days, rem = divmod(remaining, 86400)
-        hours, rem = divmod(rem, 3600)
-        minutes, seconds = divmod(rem, 60)
 
-    template = cfg.get("template", "circular")
-    prefix = cfg.get("message_prefix", "")
-    bg = cfg.get("background_color", "#FFFFFF")
-    text_color = cfg.get("text_color", "#111111")
-    show_labels = cfg.get("show_labels", True)
+def _text_size(draw: ImageDraw.ImageDraw, text: str, font):
+    bbox = draw.textbbox((0, 0), text, font=font)
+    return bbox[2] - bbox[0], bbox[3] - bbox[1]
+
+
+# =====================================================
+# BASIC TEMPLATE
+# =====================================================
+
+def _draw_basic_frame(draw, cfg, days, hours, minutes, seconds):
+    W = cfg["width"] * SCALE
+    H = cfg["height"] * SCALE
+
+    main_font = _load_font(cfg["font_size"] * SCALE)
+    label_font = _load_font(cfg["basic_label_size"] * SCALE)
 
     units = [("J", days), ("H", hours), ("M", minutes), ("S", seconds)]
+    gap = cfg["basic_gap"] * SCALE
+    show_labels = cfg["show_labels"]
 
-    # --- En-tête SVG ---
-    svg = [
-        f'<svg xmlns="http://www.w3.org/2000/svg" width="{w}" height="{h}" viewBox="0 0 {w} {h}">',
-        f'<rect width="100%" height="100%" fill="{bg}"/>'
-    ]
-
-    # Préfixe centré en haut
+    # Préfixe haut
+    prefix = cfg.get("message_prefix") or ""
     if prefix:
-        svg.append(
-            f'<text x="{w/2}" y="26" text-anchor="middle" '
-            f'font-family="system-ui, -apple-system, sans-serif" '
-            f'font-size="18" font-weight="500" fill="{text_color}">{_esc(prefix)}</text>'
-        )
+        prefix_font = _load_font(int(cfg["font_size"] * 0.6) * SCALE)
+        tw, th = _text_size(draw, prefix, prefix_font)
+        draw.text(((W - tw) // 2, 18 * SCALE), prefix,
+                  font=prefix_font, fill=cfg["text_color"])
 
-    # ===================================================================
-    # TEMPLATE CIRCULAR  (100% synchronisé avec renderer_gif.py)
-    # ===================================================================
-    if template == "circular":
-        spacing = cfg["circular_spacing"]
-        base_color = cfg["circular_base_color"]
-        progress_color = cfg["circular_progress_color"]
-        label_color = cfg["circular_label_color"]
-        label_size = cfg["circular_label_size"]
-        uppercase = cfg["circular_label_uppercase"]
-        thickness = cfg["circular_thickness"]
-
-        # Même logique de rayon que dans GIF (mais sans SCALE)
-        padding = 40
-        available_w = w - padding * 2
-        count = 4
-        radius = int((available_w - (count - 1) * spacing) / (count * 2))
-        radius = max(radius, 20)
-
-        # même position que GIF
-        center_y = h / 2 + 4
-
-        # ratios identiques
-        ratios = [
-            min(days / 30, 1.0),
-            hours / 24 if hours >= 0 else 0,
-            minutes / 60 if minutes >= 0 else 0,
-            seconds / 60 if seconds >= 0 else 0,
-        ]
-
-        total_width = count * (2 * radius) + (count - 1) * spacing
-        start_x = (w - total_width) / 2
-
-        for i, ((label, val), ratio) in enumerate(zip(units, ratios)):
-            cx = start_x + radius + i * (2 * radius + spacing)
-            cy = center_y
-
-            # cercle base
-            svg.append(
-                f'<circle cx="{cx}" cy="{cy}" r="{radius}" '
-                f'stroke="{base_color}" stroke-width="{thickness}" '
-                f'fill="none"/>'
-            )
-
-            # progression (stroke-dasharray)
-            circ = 2 * math.pi * radius
-            dash = max(0.0, min(ratio, 1.0)) * circ
-            svg.append(
-                f'<circle cx="{cx}" cy="{cy}" r="{radius}" '
-                f'stroke="{progress_color}" stroke-width="{thickness}" '
-                f'fill="none" stroke-dasharray="{dash} {circ - dash}" '
-                f'transform="rotate(-90 {cx} {cy})"/>'
-            )
-
-            # valeur numérique
-            #
-            # ⬇️ Compensation identique à renderer_gif :
-            #     text_y = cy - th * 0.56
-            #
-            # En SVG, on utilise dominant-baseline="central"
-            # puis on applique un léger shift identique à GIF.
-            #
-            baseline_fix = cfg["font_size"] * 0.56
-            text_y = cy - baseline_fix
-
-            svg.append(
-                f'<text x="{cx}" y="{text_y}" text-anchor="middle" '
-                f'font-size="{cfg["font_size"]}" '
-                f'dominant-baseline="middle" '
-                f'font-family="system-ui, -apple-system, sans-serif" '
-                f'fill="{text_color}">{val:02d}</text>'
-            )
-
-            # label
-            if show_labels:
-                lbl = label.upper() if uppercase else label
-                svg.append(
-                    f'<text x="{cx}" y="{cy + radius + 16}" text-anchor="middle" '
-                    f'font-size="{label_size}" '
-                    f'font-family="system-ui, -apple-system, sans-serif" '
-                    f'fill="{label_color}">{lbl}</text>'
-                )
-
-        svg.append("</svg>")
-        return "\n".join(svg)
-
-    # ===================================================================
-    # TEMPLATE BASIC (inchangé)
-    # ===================================================================
-    main_size = cfg["font_size"]
-    label_size = cfg["basic_label_size"]
-    gap = cfg["basic_gap"]
-    between = 18
-
-    char_w = main_size * 0.7
-    label_w = label_size * 0.6
-
-    total_width = 0
-    for label, val in units:
-        num_w = 2 * char_w
-        lab_w = label_w
-        bw = max(num_w, lab_w)
-        total_width += bw
-    total_width += between * (len(units) - 1)
-
-    center_y = h / 2 + 10
-    start_x = (w - total_width) / 2
-    x = start_x
+    # Calcul blocs
+    blocks = []
+    between = 18 * SCALE
+    total_w = 0
 
     for label, val in units:
-        num_w = 2 * char_w
-        lab_w = label_w
-        bw = max(num_w, lab_w)
-        num_x = x + bw / 2
+        val_txt = f"{val:02}"
+        tw, th = _text_size(draw, val_txt, main_font)
+        lw, lh = _text_size(draw, label, label_font) if show_labels else (0, 0)
 
-        # valeur
-        svg.append(
-            f'<text x="{num_x}" y="{center_y}" text-anchor="middle" '
-            f'font-size="{main_size}" '
-            f'font-family="system-ui, -apple-system, sans-serif" '
-            f'fill="{text_color}">{val:02d}</text>'
-        )
+        bw = max(tw, lw)
+        bh = th + (gap + lh if show_labels else 0)
 
-        # label
+        blocks.append({
+            "label": label, "val": val_txt,
+            "tw": tw, "th": th, "lw": lw, "lh": lh,
+            "bw": bw, "bh": bh
+        })
+        total_w += bw
+
+    total_w += between * (len(blocks) - 1)
+    center_y = H // 2 + 10 * SCALE
+    x = (W - total_w) // 2
+
+    for b in blocks:
+        top = center_y - b["bh"] // 2
+
+        draw.text((x + (b["bw"] - b["tw"]) // 2, top),
+                  b["val"], font=main_font, fill=cfg["text_color"])
+
         if show_labels:
-            svg.append(
-                f'<text x="{num_x}" y="{center_y + main_size + gap}" text-anchor="middle" '
-                f'font-size="{label_size}" '
-                f'font-family="system-ui, -apple-system, sans-serif" '
-                f'fill="{cfg["basic_label_color"]}">{label}</text>'
-            )
+            draw.text((x + (b["bw"] - b["lw"]) // 2, top + b["th"] + gap),
+                      b["label"], font=label_font,
+                      fill=cfg["basic_label_color"])
 
-        x += bw + between
+        x += b["bw"] + between
 
-    svg.append("</svg>")
-    return "\n".join(svg)
+
+# =====================================================
+# CIRCULAR TEMPLATE — version sécurisée et synchronisée
+# =====================================================
+
+def _draw_circular_frame(draw, cfg, days, hours, minutes, seconds):
+    W = cfg["width"] * SCALE
+    H = cfg["height"] * SCALE
+
+    base_color = cfg["circular_base_color"]
+    progress_color = cfg["circular_progress_color"]
+    thickness = max(1, cfg["circular_thickness"] * SCALE)
+    spacing = cfg["circular_spacing"] * SCALE
+    inner_ratio = float(cfg.get("circular_inner_ratio", 0.7))
+
+    # Protection des valeurs utilisateur
+    inner_ratio = max(0.1, min(inner_ratio, 0.95))
+
+    units = [("J", days, 30), ("H", hours, 24),
+             ("M", minutes, 60), ("S", seconds, 60)]
+
+    padding = 40 * SCALE
+    available_w = W - padding * 2
+    count = 4
+
+    # Calcul du rayon de base
+    radius = int((available_w - (count - 1) * spacing) / (count * 2))
+    radius = max(radius, 20 * SCALE)
+
+    # Correction automatique anti-crash :
+    max_inner = radius * inner_ratio
+    if max_inner + thickness >= radius:
+        thickness = max(1, int(radius - (radius * inner_ratio) - 4))
+
+    center_y = H // 2 + 4 * SCALE
+
+    font_main = _load_font(cfg["font_size"] * SCALE)
+    font_label = _load_font(cfg["circular_label_size"] * SCALE)
+
+    # Préfixe
+    prefix = cfg.get("message_prefix") or ""
+    if prefix:
+        prefix_font = _load_font(int(cfg["font_size"] * 0.6) * SCALE)
+        tw, th = _text_size(draw, prefix, prefix_font)
+        draw.text(((W - tw) // 2, center_y - radius - th - 8 * SCALE),
+                  prefix, font=prefix_font, fill=cfg["text_color"])
+
+    # Placement horizontal
+    total_width = count * (2 * radius) + (count - 1) * spacing
+    start_x = (W - total_width) // 2
+
+    for i, (label, value, max_value) in enumerate(units):
+        ratio = 0 if max_value <= 0 else max(0.0, min(value / max_value, 1.0))
+
+        cx = start_x + radius + i * (2 * radius + spacing)
+        cy = center_y
+
+        # Cercle base
+        draw.arc((cx - radius, cy - radius, cx + radius, cy + radius),
+                 start=0, end=359, fill=base_color, width=thickness)
+
+        # Progression
+        end_angle = -90 + 360 * ratio
+        draw.arc((cx - radius, cy - radius, cx + radius, cy + radius),
+                 start=-90, end=end_angle,
+                 fill=progress_color, width=thickness)
+
+        # Valeur
+        num_txt = f"{value:02}"
+        tw, th = _text_size(draw, num_txt, font_main)
+        draw.text((cx - tw // 2, cy - th // 2 - 1),
+                  num_txt, font=font_main, fill=cfg["text_color"])
+
+        # Label
+        if cfg["show_labels"]:
+            lbl = label.upper() if cfg["circular_label_uppercase"] else label
+            lw, lh = _text_size(draw, lbl, font_label)
+            draw.text((cx - lw // 2, cy + radius + int(12 * SCALE)),
+                      lbl, font=font_label, fill=cfg["circular_label_color"])
+
+
+# =====================================================
+# GÉNÉRATION GIF
+# =====================================================
+
+def generate_gif(cfg: dict, end_time: datetime) -> BytesIO:
+    now = datetime.utcnow()
+    loop_duration = int(cfg.get("loop_duration", 20))
+    frames = []
+
+    for i in range(loop_duration):
+        current = now + timedelta(seconds=i)
+        remaining = int((end_time - current).total_seconds())
+
+        big = Image.new("RGB",
+                        (cfg["width"] * SCALE, cfg["height"] * SCALE),
+                        cfg["background_color"])
+        draw = ImageDraw.Draw(big)
+
+        if remaining <= 0:
+            txt = "⏰ Terminé !"
+            font_big = _load_font(cfg["font_size"] * SCALE)
+            tw, th = _text_size(draw, txt, font_big)
+            draw.text(((cfg["width"] * SCALE - tw) // 2,
+                       (cfg["height"] * SCALE - th) // 2),
+                      txt, font=font_big, fill=cfg["text_color"])
+        else:
+            total_sec = remaining
+            days, rem = divmod(total_sec, 86400)
+            hours, rem = divmod(rem, 3600)
+            minutes, seconds = divmod(rem, 60)
+
+            if cfg["template"] == "circular":
+                _draw_circular_frame(draw, cfg, days, hours, minutes, seconds)
+            else:
+                _draw_basic_frame(draw, cfg, days, hours, minutes, seconds)
+
+        final = big.resize((cfg["width"], cfg["height"]), Image.LANCZOS)
+        frames.append(final)
+
+    buf = BytesIO()
+    frames[0].save(
+        buf, format="GIF",
+        save_all=True,
+        append_images=frames[1:],
+        duration=1000,
+        loop=0
+    )
+    buf.seek(0)
+    return buf

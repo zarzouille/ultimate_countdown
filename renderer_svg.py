@@ -14,15 +14,10 @@ def _esc(s: str) -> str:
 
 
 def svg_preview(cfg: dict) -> str:
-    """
-    Génère le SVG d'aperçu pour la config donnée.
-    Le layout du template 'circular' est calqué sur celui du GIF
-    pour éviter les différences de spacing / taille.
-    """
     w = cfg["width"]
     h = cfg["height"]
 
-    # --- Temps restant ---
+    # Temps restant
     try:
         end = datetime.fromisoformat(cfg["target_date"])
     except Exception:
@@ -30,6 +25,7 @@ def svg_preview(cfg: dict) -> str:
 
     now = datetime.utcnow()
     remaining = int((end - now).total_seconds())
+
     if remaining <= 0:
         days = hours = minutes = seconds = 0
     else:
@@ -39,55 +35,59 @@ def svg_preview(cfg: dict) -> str:
 
     template = cfg.get("template", "circular")
     prefix = cfg.get("message_prefix", "")
-    bg = cfg.get("background_color", "#FFFFFF")
-    text_color = cfg.get("text_color", "#111111")
-    show_labels = cfg.get("show_labels", True)
+    bg = cfg["background_color"]
+    text_color = cfg["text_color"]
+    show_labels = cfg["show_labels"]
 
-    units = [("J", days), ("H", hours), ("M", minutes), ("S", seconds)]
-
-    # --- En-tête SVG ---
+    # Header SVG
     svg = [
         f'<svg xmlns="http://www.w3.org/2000/svg" width="{w}" height="{h}" viewBox="0 0 {w} {h}">',
         f'<rect width="100%" height="100%" fill="{bg}"/>'
     ]
 
-    # Préfixe centré en haut
     if prefix:
         svg.append(
             f'<text x="{w/2}" y="26" text-anchor="middle" '
-            f'font-family="system-ui, -apple-system, sans-serif" '
-            f'font-size="18" font-weight="500" fill="{text_color}">{_esc(prefix)}</text>'
+            f'font-size="18" font-family="system-ui" fill="{text_color}">{_esc(prefix)}</text>'
         )
 
-    # ===================================================================
-    # TEMPLATE CIRCULAR  (aligné avec renderer_gif._draw_circular_frame)
-    # ===================================================================
+    # =====================================================
+    # CIRCULAR (match GIF)
+    # =====================================================
     if template == "circular":
         spacing = cfg["circular_spacing"]
         base_color = cfg["circular_base_color"]
         progress_color = cfg["circular_progress_color"]
+        thickness = cfg["circular_thickness"]
         label_color = cfg["circular_label_color"]
         label_size = cfg["circular_label_size"]
         uppercase = cfg["circular_label_uppercase"]
-        thickness = cfg["circular_thickness"]
+        inner_ratio = float(cfg.get("circular_inner_ratio", 0.7))
 
-        # même logique que dans le GIF (sans SCALE)
+        # Protection identique
+        inner_ratio = max(0.1, min(inner_ratio, 0.95))
+
+        units = [("J", days), ("H", hours), ("M", minutes), ("S", seconds)]
+
         padding = 40
         available_w = w - padding * 2
         count = 4
+
         radius = int((available_w - (count - 1) * spacing) / (count * 2))
         radius = max(radius, 20)
 
-        # position verticale
+        # Correction thickness identique au GIF
+        if radius * inner_ratio + thickness >= radius:
+            thickness = max(1, int(radius - radius * inner_ratio - 4))
+
         center_y = h / 2 + 4
 
-        # ratios de progression
-        max_days = 30
-        days_ratio = min(days / max_days, 1.0) if max_days > 0 else 1.0
-        hours_ratio = hours / 24 if hours >= 0 else 0
-        minutes_ratio = minutes / 60 if minutes >= 0 else 0
-        seconds_ratio = seconds / 60 if seconds >= 0 else 0
-        ratios = [days_ratio, hours_ratio, minutes_ratio, seconds_ratio]
+        ratios = [
+            min(days / 30, 1.0),
+            min(hours / 24, 1.0),
+            min(minutes / 60, 1.0),
+            min(seconds / 60, 1.0),
+        ]
 
         total_width = count * (2 * radius) + (count - 1) * spacing
         start_x = (w - total_width) / 2
@@ -96,47 +96,48 @@ def svg_preview(cfg: dict) -> str:
             cx = start_x + radius + i * (2 * radius + spacing)
             cy = center_y
 
-            # cercle de base
-            svg.append(
-                f'<circle cx="{cx}" cy="{cy}" r="{radius}" '
-                f'stroke="{base_color}" stroke-width="{thickness}" '
-                f'fill="none"/>'
-            )
-
-            # progression (stroke-dasharray)
             circ = 2 * math.pi * radius
             dash = max(0.0, min(ratio, 1.0)) * circ
+
+            # Base
             svg.append(
                 f'<circle cx="{cx}" cy="{cy}" r="{radius}" '
-                f'stroke="{progress_color}" stroke-width="{thickness}" '
-                f'fill="none" stroke-dasharray="{dash} {circ - dash}" '
+                f'stroke="{base_color}" stroke-width="{thickness}" fill="none"/>'
+            )
+
+            # Progression
+            svg.append(
+                f'<circle cx="{cx}" cy="{cy}" r="{radius}" '
+                f'stroke="{progress_color}" stroke-width="{thickness}" fill="none" '
+                f'stroke-dasharray="{dash} {circ - dash}" '
                 f'transform="rotate(-90 {cx} {cy})"/>'
             )
 
-            # valeur numérique
+            # Valeur centrée (match GIF)
             svg.append(
-                f'<text x="{cx}" y="{cy+4}" text-anchor="middle" '
+                f'<text x="{cx}" y="{cy+2}" text-anchor="middle" '
                 f'font-size="{cfg["font_size"]}" '
-                f'font-family="system-ui, -apple-system, sans-serif" '
-                f'fill="{text_color}" dominant-baseline="middle">{val:02d}</text>'
+                f'font-family="system-ui" fill="{text_color}" '
+                f'dominant-baseline="middle">{val:02d}</text>'
             )
 
-            # label
+            # Label
             if show_labels:
                 lbl = label.upper() if uppercase else label
                 svg.append(
-                    f'<text x="{cx}" y="{cy + radius + 16}" text-anchor="middle" '
+                    f'<text x="{cx}" y="{cy + radius + 14}" text-anchor="middle" '
                     f'font-size="{label_size}" '
-                    f'font-family="system-ui, -apple-system, sans-serif" '
-                    f'fill="{label_color}">{lbl}</text>'
+                    f'font-family="system-ui" fill="{label_color}">{lbl}</text>'
                 )
 
         svg.append("</svg>")
         return "\n".join(svg)
 
-    # ===================================================================
-    # TEMPLATE BASIC (inchangé)
-    # ===================================================================
+    # =====================================================
+    # BASIC (inchangé)
+    # =====================================================
+    units = [("J", days), ("H", hours), ("M", minutes), ("S", seconds)]
+
     main_size = cfg["font_size"]
     label_size = cfg["basic_label_size"]
     gap = cfg["basic_gap"]
@@ -147,37 +148,28 @@ def svg_preview(cfg: dict) -> str:
 
     total_width = 0
     for label, val in units:
-        num_w = 2 * char_w
-        lab_w = label_w
-        bw = max(num_w, lab_w)
+        bw = max(2 * char_w, label_w)
         total_width += bw
     total_width += between * (len(units) - 1)
 
     center_y = h / 2 + 10
-    start_x = (w - total_width) / 2
-    x = start_x
+    x = (w - total_width) / 2
 
     for label, val in units:
-        num_w = 2 * char_w
-        lab_w = label_w
-        bw = max(num_w, lab_w)
+        bw = max(2 * char_w, label_w)
         num_x = x + bw / 2
 
-        # valeur
         svg.append(
-            f'<text x="{num_x}" y="{center_y}" text-anchor="middle" '
-            f'font-size="{main_size}" '
-            f'font-family="system-ui, -apple-system, sans-serif" '
-            f'fill="{text_color}">{val:02d}</text>'
+            f'<text x="{num_x}" y="{center_y}" '
+            f'text-anchor="middle" font-size="{main_size}" '
+            f'font-family="system-ui" fill="{text_color}">{val:02d}</text>'
         )
 
-        # label
         if show_labels:
             svg.append(
-                f'<text x="{num_x}" y="{center_y + main_size + gap}" text-anchor="middle" '
-                f'font-size="{label_size}" '
-                f'font-family="system-ui, -apple-system, sans-serif" '
-                f'fill="{cfg["basic_label_color"]}">{label}</text>'
+                f'<text x="{num_x}" y="{center_y + main_size + gap}" '
+                f'text-anchor="middle" font-size="{label_size}" '
+                f'font-family="system-ui" fill="{cfg["basic_label_color"]}">{label}</text>'
             )
 
         x += bw + between
