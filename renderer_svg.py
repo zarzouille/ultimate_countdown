@@ -1,7 +1,6 @@
 import math
 from datetime import datetime, timedelta
 
-
 def _esc(s: str) -> str:
     if s is None:
         return ""
@@ -12,33 +11,13 @@ def _esc(s: str) -> str:
         .replace(">", "&gt;")
     )
 
-
-def _lighten_color(hex_color: str, factor: float = 0.6) -> str:
-    """
-    Éclaircit une couleur hex (#RRGGBB) en la rapprochant du blanc.
-    factor = proportion de mélange vers le blanc (0–1).
-    """
-    try:
-        hex_color = hex_color.lstrip("#")
-        r = int(hex_color[0:2], 16)
-        g = int(hex_color[2:4], 16)
-        b = int(hex_color[4:6], 16)
-    except Exception:
-        return hex_color if hex_color.startswith("#") else f"#{hex_color}"
-
-    def mix(c):
-        return int(c + (255 - c) * factor)
-
-    lr = mix(r)
-    lg = mix(g)
-    lb = mix(b)
-    return f"#{lr:02X}{lg:02X}{lb:02X}"
-
-
 def svg_preview(cfg: dict) -> str:
     w = cfg["width"]
     h = cfg["height"]
 
+    # -----------------------------
+    # 1) Récupération du temps restant
+    # -----------------------------
     try:
         end = datetime.fromisoformat(cfg["target_date"])
     except Exception:
@@ -59,29 +38,35 @@ def svg_preview(cfg: dict) -> str:
     text_color = cfg.get("text_color", "#111111")
     show_labels = cfg.get("show_labels", True)
 
-    font_bold = bool(cfg.get("font_bold", False))
-    label_bold = bool(cfg.get("label_bold", False))
-    prefix_bold = bool(cfg.get("prefix_bold", False))
+    # Gras
+    prefix_weight = "700" if cfg.get("prefix_bold") else "500"
+    number_weight = "700" if cfg.get("font_bold") else "500"
+    label_weight = "700" if cfg.get("label_bold") else "500"
 
     units = [("J", days), ("H", hours), ("M", minutes), ("S", seconds)]
 
+    # -----------------------------
+    # 2) Structure SVG
+    # -----------------------------
     svg = [
         f'<svg xmlns="http://www.w3.org/2000/svg" width="{w}" height="{h}" viewBox="0 0 {w} {h}">',
         f'<rect width="100%" height="100%" fill="{bg}"/>'
     ]
 
-    # Préfixe
+    # -----------------------------
+    # 3) Préfixe
+    # -----------------------------
     if prefix:
         svg.append(
             f'<text x="{w/2}" y="26" text-anchor="middle" '
             f'font-family="system-ui, -apple-system, sans-serif" '
-            f'font-size="18" font-weight="{"bold" if prefix_bold else "normal"}" '
+            f'font-size="18" font-weight="{prefix_weight}" '
             f'fill="{text_color}">{_esc(prefix)}</text>'
         )
 
-    # ======================
-    # CIRCULAR (version PRO)
-    # ======================
+    # -----------------------------
+    # 4) TEMPLATE CIRCULAR
+    # -----------------------------
     if template == "circular":
         spacing = cfg["circular_spacing"]
         base_color = cfg["circular_base_color"]
@@ -94,6 +79,7 @@ def svg_preview(cfg: dict) -> str:
         padding = 40
         available_w = w - padding * 2
         count = 4
+
         radius = int((available_w - (count - 1) * spacing) / (count * 2))
         radius = max(radius, 20)
 
@@ -110,65 +96,53 @@ def svg_preview(cfg: dict) -> str:
         total_width = count * (2 * radius) + (count - 1) * spacing
         start_x = (w - total_width) / 2
 
-        glow_color = _lighten_color(progress_color, factor=0.6)
-
         for i, ((label, val), ratio) in enumerate(zip(units, ratios)):
             cx = start_x + radius + i * (2 * radius + spacing)
             cy = center_y
 
-            # cercle base
+            # Cercle base
             svg.append(
                 f'<circle cx="{cx}" cy="{cy}" r="{radius}" '
-                f'stroke="{base_color}" stroke-width="{thickness}" fill="none" />'
+                f'stroke="{base_color}" stroke-width="{thickness}" fill="none"/>'
             )
 
-            # halo (glow) derrière la progression
+            # Progression
             circ = 2 * math.pi * radius
             dash = max(0.0, min(ratio, 1.0)) * circ
 
             svg.append(
                 f'<circle cx="{cx}" cy="{cy}" r="{radius}" '
-                f'stroke="{glow_color}" stroke-width="{thickness * 1.8}" fill="none" '
-                f'stroke-dasharray="{dash} {circ - dash}" '
-                f'stroke-linecap="round" '
-                f'transform="rotate(-90 {cx} {cy})" opacity="0.7"/>'
-            )
-
-            # progression principale
-            svg.append(
-                f'<circle cx="{cx}" cy="{cy}" r="{radius}" '
                 f'stroke="{progress_color}" stroke-width="{thickness}" fill="none" '
                 f'stroke-dasharray="{dash} {circ - dash}" '
-                f'stroke-linecap="round" '
                 f'transform="rotate(-90 {cx} {cy})"/>'
             )
 
-            # valeur centrée
+            # Valeur
             svg.append(
                 f'<text x="{cx}" y="{cy+4}" text-anchor="middle" '
                 f'font-size="{cfg["font_size"]}" '
                 f'font-family="system-ui, -apple-system, sans-serif" '
-                f'font-weight="{"bold" if font_bold else "normal"}" '
+                f'font-weight="{number_weight}" '
                 f'fill="{text_color}" dominant-baseline="middle">{val:02d}</text>'
             )
 
-            # label
+            # Label
             if show_labels:
                 lbl = label.upper() if uppercase else label
                 svg.append(
                     f'<text x="{cx}" y="{cy + radius + 32}" text-anchor="middle" '
                     f'font-size="{label_size}" '
                     f'font-family="system-ui, -apple-system, sans-serif" '
-                    f'font-weight="{"bold" if label_bold else "normal"}" '
+                    f'font-weight="{label_weight}" '
                     f'fill="{label_color}">{lbl}</text>'
                 )
 
         svg.append("</svg>")
         return "\n".join(svg)
 
-    # ======================
-    # BASIC
-    # ======================
+    # -----------------------------
+    # 5) TEMPLATE BASIC (inchangé)
+    # -----------------------------
     main_size = cfg["font_size"]
     label_size = cfg["basic_label_size"]
     gap = cfg["basic_gap"]
@@ -199,7 +173,7 @@ def svg_preview(cfg: dict) -> str:
             f'<text x="{num_x}" y="{center_y}" text-anchor="middle" '
             f'font-size="{main_size}" '
             f'font-family="system-ui, -apple-system, sans-serif" '
-            f'font-weight="{"bold" if font_bold else "normal"}" '
+            f'font-weight="{number_weight}" '
             f'fill="{text_color}">{val:02d}</text>'
         )
 
@@ -208,7 +182,7 @@ def svg_preview(cfg: dict) -> str:
                 f'<text x="{num_x}" y="{center_y + main_size + gap}" text-anchor="middle" '
                 f'font-size="{label_size}" '
                 f'font-family="system-ui, -apple-system, sans-serif" '
-                f'font-weight="{"bold" if label_bold else "normal"}" '
+                f'font-weight="{label_weight}" '
                 f'fill="{cfg["basic_label_color"]}">{label}</text>'
             )
 

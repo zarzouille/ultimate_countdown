@@ -50,7 +50,6 @@ DEFAULT_CONFIG = {
     "basic_gap": 4,
 }
 
-
 app = Flask(__name__)
 
 
@@ -83,12 +82,16 @@ def load_config(cid: str):
     return cfg
 
 
-def dt_for_input(iso_str: str) -> str:
+def split_target_for_inputs(iso_str: str):
+    """
+    Découpe "2025-12-31T23:59:59" en ("2025-12-31", "23:59")
+    pour alimenter les champs <input type="date"> et <input type="time">
+    """
     try:
         dt = datetime.fromisoformat(iso_str)
-        return dt.strftime("%Y-%m-%dT%H:%M")
+        return dt.strftime("%Y-%m-%d"), dt.strftime("%H:%M")
     except Exception:
-        return iso_str[:16]
+        return "", ""
 
 
 def parse_bool(val):
@@ -115,14 +118,21 @@ def settings():
             tpl = "basic"
         cfg["template"] = tpl
 
-        # Options communes
-        td_raw = form.get("target_date", "").strip()
-        if td_raw:
-            iso = td_raw.replace(" ", "T")
-            if len(iso) == 16:
-                iso += ":00"
-            cfg["target_date"] = iso
+        # --------- DATE + HEURE SÉPARÉES ----------
+        # target_date_only : "2025-12-31"
+        # target_time_only : "23:59"
+        date_only = (form.get("target_date_only") or "").strip()
+        time_only = (form.get("target_time_only") or "").strip()
 
+        if date_only:
+            # Si l'heure est vide, on force minuit
+            if not time_only:
+                time_only = "00:00"
+            iso = f"{date_only}T{time_only}:00"
+            cfg["target_date"] = iso
+        # Si aucune date, on garde la valeur précédente (cfg vient de DEFAULT_CONFIG)
+
+        # Options communes
         cfg["message_prefix"] = form.get("message_prefix", cfg["message_prefix"])
         cfg["background_color"] = form.get("background_color", cfg["background_color"])
         cfg["text_color"] = form.get("text_color", cfg["text_color"])
@@ -178,12 +188,14 @@ def settings():
 
         img_link = request.url_root.rstrip("/") + url_for("countdown_image", countdown_id=cid)
 
-    target_date_value = dt_for_input(cfg["target_date"])
+    # Valeurs initiales pour les nouveaux champs (date + heure)
+    date_only, time_only = split_target_for_inputs(cfg["target_date"])
 
     return render_template(
         "settings.html",
         config=cfg,
-        target_date=target_date_value,
+        target_date_only=date_only,
+        target_time_only=time_only,
         img_link=img_link,
     )
 
@@ -228,6 +240,7 @@ def preview_svg():
     cfg["label_bold"] = parse_bool(q.get("label_bold"))
     cfg["prefix_bold"] = parse_bool(q.get("prefix_bold"))
 
+    # target_date = string ISO reçue depuis JS (date + heure combinées)
     td_raw = q.get("target_date")
     if td_raw:
         iso = td_raw.replace(" ", "T")

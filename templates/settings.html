@@ -32,10 +32,30 @@
 	            <!-- Options communes -->
                 <div class="section">
                     <h2>2. Paramètres généraux</h2>
-
+	                
+	                <!-- NOUVEAU : date + heure séparées -->
                     <div class="field">
-                        <label for="target_date">Date cible</label>
-                        <input type="datetime-local" id="target_date" name="target_date" value="{{ target_date }}">
+                        <label>Fin du compte à rebours</label>
+                        <div class="field-row">
+                            <div class="field">
+                                <label for="target_date_only">Date</label>
+                                <input
+		                                type="date"
+		                                id="target_date_only"
+		                                name="target_date_only"
+		                                value="{{ target_date_only }}"
+                                >
+                            </div>
+                            <div class="field">
+                                <label for="target_time_only">Heure</label>
+                                <input
+		                                type="time"
+		                                id="target_time_only"
+		                                name="target_time_only"
+		                                value="{{ target_time_only }}"
+                                >
+                            </div>
+                        </div>
                     </div>
 
                     <div class="field">
