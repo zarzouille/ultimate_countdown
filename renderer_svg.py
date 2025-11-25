@@ -13,6 +13,28 @@ def _esc(s: str) -> str:
     )
 
 
+def _lighten_color(hex_color: str, factor: float = 0.6) -> str:
+    """
+    Éclaircit une couleur hex (#RRGGBB) en la rapprochant du blanc.
+    factor = proportion de mélange vers le blanc (0–1).
+    """
+    try:
+        hex_color = hex_color.lstrip("#")
+        r = int(hex_color[0:2], 16)
+        g = int(hex_color[2:4], 16)
+        b = int(hex_color[4:6], 16)
+    except Exception:
+        return hex_color if hex_color.startswith("#") else f"#{hex_color}"
+
+    def mix(c):
+        return int(c + (255 - c) * factor)
+
+    lr = mix(r)
+    lg = mix(g)
+    lb = mix(b)
+    return f"#{lr:02X}{lg:02X}{lb:02X}"
+
+
 def svg_preview(cfg: dict) -> str:
     w = cfg["width"]
     h = cfg["height"]
@@ -44,6 +66,7 @@ def svg_preview(cfg: dict) -> str:
         f'<rect width="100%" height="100%" fill="{bg}"/>'
     ]
 
+    # Préfixe
     if prefix:
         svg.append(
             f'<text x="{w/2}" y="26" text-anchor="middle" '
@@ -51,6 +74,9 @@ def svg_preview(cfg: dict) -> str:
             f'font-size="18" font-weight="500" fill="{text_color}">{_esc(prefix)}</text>'
         )
 
+    # ======================
+    # CIRCULAR (version PRO)
+    # ======================
     if template == "circular":
         spacing = cfg["circular_spacing"]
         base_color = cfg["circular_base_color"]
@@ -83,20 +109,35 @@ def svg_preview(cfg: dict) -> str:
             cx = start_x + radius + i * (2 * radius + spacing)
             cy = center_y
 
+            # cercle base
             svg.append(
                 f'<circle cx="{cx}" cy="{cy}" r="{radius}" '
-                f'stroke="{base_color}" stroke-width="{thickness}" fill="none"/>'
+                f'stroke="{base_color}" stroke-width="{thickness}" fill="none" />'
             )
 
+            # halo (glow) derrière la progression
+            glow_color = _lighten_color(progress_color, factor=0.6)
             circ = 2 * math.pi * radius
             dash = max(0.0, min(ratio, 1.0)) * circ
+
+            svg.append(
+                f'<circle cx="{cx}" cy="{cy}" r="{radius}" '
+                f'stroke="{glow_color}" stroke-width="{thickness * 1.8}" fill="none" '
+                f'stroke-dasharray="{dash} {circ - dash}" '
+                f'stroke-linecap="round" '
+                f'transform="rotate(-90 {cx} {cy})" opacity="0.7"/>'
+            )
+
+            # progression principale
             svg.append(
                 f'<circle cx="{cx}" cy="{cy}" r="{radius}" '
                 f'stroke="{progress_color}" stroke-width="{thickness}" fill="none" '
                 f'stroke-dasharray="{dash} {circ - dash}" '
+                f'stroke-linecap="round" '
                 f'transform="rotate(-90 {cx} {cy})"/>'
             )
 
+            # valeur centrée
             svg.append(
                 f'<text x="{cx}" y="{cy+4}" text-anchor="middle" '
                 f'font-size="{cfg["font_size"]}" '
@@ -104,10 +145,9 @@ def svg_preview(cfg: dict) -> str:
                 f'fill="{text_color}" dominant-baseline="middle">{val:02d}</text>'
             )
 
+            # label
             if show_labels:
                 lbl = label.upper() if uppercase else label
-
-                # 🔥 FIX DISTANCE LABELS (32 px comme le GIF)
                 svg.append(
                     f'<text x="{cx}" y="{cy + radius + 32}" text-anchor="middle" '
                     f'font-size="{label_size}" '
@@ -118,7 +158,9 @@ def svg_preview(cfg: dict) -> str:
         svg.append("</svg>")
         return "\n".join(svg)
 
+    # ======================
     # BASIC (inchangé)
+    # ======================
     main_size = cfg["font_size"]
     label_size = cfg["basic_label_size"]
     gap = cfg["basic_gap"]
