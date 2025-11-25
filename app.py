@@ -29,7 +29,12 @@ DEFAULT_CONFIG = {
     "show_labels": True,
     "loop_duration": 20,
 
-    # Template CIRCULAR
+    # Gras
+    "font_bold": False,
+    "label_bold": False,
+    "prefix_bold": False,
+
+    # Template CIRCULAR (Pro)
     "circular_base_color": "#E0EAFF",
     "circular_progress_color": "#4C6FFF",
     "circular_thickness": 10,
@@ -129,6 +134,11 @@ def settings():
 
         cfg["show_labels"] = ("show_labels" in form)
 
+        # Gras
+        cfg["font_bold"] = ("font_bold" in form)
+        cfg["label_bold"] = ("label_bold" in form)
+        cfg["prefix_bold"] = ("prefix_bold" in form)
+
         # CIRCULAR
         cfg["circular_base_color"] = form.get("circular_base_color", cfg["circular_base_color"])
         cfg["circular_progress_color"] = form.get("circular_progress_color", cfg["circular_progress_color"])
@@ -212,6 +222,11 @@ def preview_svg():
         cfg["message_prefix"] = mp
 
     cfg["show_labels"] = parse_bool(q.get("show_labels"))
+
+    # Gras
+    cfg["font_bold"] = parse_bool(q.get("font_bold"))
+    cfg["label_bold"] = parse_bool(q.get("label_bold"))
+    cfg["prefix_bold"] = parse_bool(q.get("prefix_bold"))
 
     td_raw = q.get("target_date")
     if td_raw:

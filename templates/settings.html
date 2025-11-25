@@ -32,16 +32,11 @@
 	            <!-- Options communes -->
                 <div class="section">
                     <h2>2. Paramètres généraux</h2>
-	                
-	                
-	                <div class="field">
-					    <label for="target_date">Date cible</label>
-					
-					    <div class="date-wrapper" onclick="document.getElementById('target_date').showPicker()">
-					        <input type="datetime-local" id="target_date" name="target_date"
-							        value="{{ target_date }}" class="date-input">
-					    </div>
-					</div>
+
+                    <div class="field">
+                        <label for="target_date">Date cible</label>
+                        <input type="datetime-local" id="target_date" name="target_date" value="{{ target_date }}">
+                    </div>
 
                     <div class="field">
                         <label for="message_prefix">Préfixe du message</label>
@@ -71,9 +66,32 @@
                             </label>
                         </div>
                     </div>
+	                
+	                <!-- Gras -->
+                    <div class="field-row">
+                        <div class="field checkbox-field">
+                            <label>
+                                <input type="checkbox" name="font_bold" {% if config.font_bold %}checked{% endif %}>
+                                Chiffres en gras
+                            </label>
+                        </div>
+                        <div class="field checkbox-field">
+                            <label>
+                                <input type="checkbox" name="label_bold" {% if config.label_bold %}checked{% endif %}>
+                                Labels en gras
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="field checkbox-field">
+                        <label>
+                            <input type="checkbox" name="prefix_bold" {% if config.prefix_bold %}checked{% endif %}>
+                            Préfixe en gras
+                        </label>
+                    </div>
                 </div>
 	            
-	            <!-- BASIC -->
+	            <!-- Options BASIC -->
                 <div class="section template-options" id="options-basic">
                     <h2>3. Options Basic</h2>
 
@@ -94,7 +112,7 @@
                     </div>
                 </div>
 	            
-	            <!-- CIRCULAR -->
+	            <!-- Options CIRCULAR -->
                 <div class="section template-options" id="options-circular">
                     <h2>3. Options Circular</h2>
 
@@ -140,7 +158,7 @@
                         </div>
                         <div class="field">
                             <label for="circular_inner_ratio">Rayon intérieur (0–0.95)</label>
-                            <input type="number" step="0.05" id="circular_inner_ratio" name="circular_inner_ratio" min="0.10" max="0.95" value="{{ config.circular_inner_ratio }}">
+                            <input type="number" step="0.05" id="circular_inner_ratio" name="circular_inner_ratio" min="0.1" max="0.95" value="{{ config.circular_inner_ratio }}">
                         </div>
                     </div>
                 </div>
@@ -149,7 +167,7 @@
             </form>
         </section>
 	    
-	    <!-- Colonne droite : preview + GIF -->
+	    <!-- Colonne droite : preview + lien GIF -->
         <section class="card preview-card">
             <h2>Aperçu live</h2>
             <p class="hint">L’aperçu utilise un SVG live qui reflète le rendu visuel du GIF final.</p>

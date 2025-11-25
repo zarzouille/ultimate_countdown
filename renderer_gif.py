@@ -5,12 +5,17 @@ from PIL import Image, ImageDraw, ImageFont
 
 
 FONT_PATH = "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"
+FONT_PATH_BOLD = "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
 SCALE = 4  # supersampling x4
 
 
-def _load_font(px_size: int):
+def _load_font(px_size: int, bold: bool = False):
+    """
+    Charge une police normale ou bold.
+    """
     try:
-        return ImageFont.truetype(FONT_PATH, px_size)
+        path = FONT_PATH_BOLD if bold else FONT_PATH
+        return ImageFont.truetype(path, px_size)
     except Exception:
         return ImageFont.load_default()
 
@@ -56,8 +61,12 @@ def _draw_basic_frame(draw, cfg, days, hours, minutes, seconds):
     W = cfg["width"] * SCALE
     H = cfg["height"] * SCALE
 
-    main_font = _load_font(cfg["font_size"] * SCALE)
-    label_font = _load_font(cfg["basic_label_size"] * SCALE)
+    font_bold = bool(cfg.get("font_bold", False))
+    label_bold = bool(cfg.get("label_bold", False))
+    prefix_bold = bool(cfg.get("prefix_bold", False))
+
+    main_font = _load_font(cfg["font_size"] * SCALE, bold=font_bold)
+    label_font = _load_font(cfg["basic_label_size"] * SCALE, bold=label_bold)
 
     units = [("J", days), ("H", hours), ("M", minutes), ("S", seconds)]
     gap = cfg["basic_gap"] * SCALE
@@ -66,7 +75,7 @@ def _draw_basic_frame(draw, cfg, days, hours, minutes, seconds):
     # Préfixe
     prefix = cfg.get("message_prefix") or ""
     if prefix:
-        prefix_font = _load_font(int(cfg["font_size"] * 0.6) * SCALE)
+        prefix_font = _load_font(int(cfg["font_size"] * 0.6) * SCALE, bold=prefix_bold)
         tw, th = _text_size(draw, prefix, prefix_font)
         draw.text(
             ((W - tw) // 2, 18 * SCALE),
@@ -155,13 +164,17 @@ def _draw_circular_frame(draw, cfg, days, hours, minutes, seconds):
 
     center_y = H // 2 + 4 * SCALE
 
-    font_main = _load_font(cfg["font_size"] * SCALE)
-    font_label = _load_font(cfg["circular_label_size"] * SCALE)
+    font_bold = bool(cfg.get("font_bold", False))
+    label_bold = bool(cfg.get("label_bold", False))
+    prefix_bold = bool(cfg.get("prefix_bold", False))
+
+    font_main = _load_font(cfg["font_size"] * SCALE, bold=font_bold)
+    font_label = _load_font(cfg["circular_label_size"] * SCALE, bold=label_bold)
 
     # Préfixe
     prefix = cfg.get("message_prefix") or ""
     if prefix:
-        prefix_font = _load_font(int(cfg["font_size"] * 0.6) * SCALE)
+        prefix_font = _load_font(int(cfg["font_size"] * 0.6) * SCALE, bold=prefix_bold)
         tw, th = _text_size(draw, prefix, prefix_font)
         draw.text(
             ((W - tw) // 2, center_y - radius - th - 8 * SCALE),
@@ -188,8 +201,8 @@ def _draw_circular_frame(draw, cfg, days, hours, minutes, seconds):
 
         # CIRCULAR PRO : halo derrière la progression
         if is_pro:
-            glow_color = _lighten_color(progress_color, factor=0.6)  # Q1: plus clair
-            glow_width = int(thickness * 1.8)                        # Q2/Q3: glow moyen
+            glow_color = _lighten_color(progress_color, factor=0.6)
+            glow_width = int(thickness * 1.8)
             end_angle_glow = -90 + 360 * ratio
             draw.arc(
                 (cx - radius, cy - radius, cx + radius, cy + radius),
@@ -256,9 +269,11 @@ def generate_gif(cfg: dict, end_time: datetime) -> BytesIO:
         )
         draw = ImageDraw.Draw(big)
 
+        font_bold = bool(cfg.get("font_bold", False))
+
         if remaining <= 0:
             txt = "⏰ Terminé !"
-            font_big = _load_font(cfg["font_size"] * SCALE)
+            font_big = _load_font(cfg["font_size"] * SCALE, bold=font_bold)
             tw, th = _text_size(draw, txt, font_big)
             draw.text(
                 ((cfg["width"] * SCALE - tw) // 2, (cfg["height"] * SCALE - th) // 2),
@@ -276,7 +291,6 @@ def generate_gif(cfg: dict, end_time: datetime) -> BytesIO:
             if template == "basic":
                 _draw_basic_frame(draw, cfg, days, hours, minutes, seconds)
             else:
-                # "circular" → version PRO
                 _draw_circular_frame(draw, cfg, days, hours, minutes, seconds)
 
         final = big.resize((cfg["width"], cfg["height"]), Image.LANCZOS)

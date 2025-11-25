@@ -59,6 +59,10 @@ def svg_preview(cfg: dict) -> str:
     text_color = cfg.get("text_color", "#111111")
     show_labels = cfg.get("show_labels", True)
 
+    font_bold = bool(cfg.get("font_bold", False))
+    label_bold = bool(cfg.get("label_bold", False))
+    prefix_bold = bool(cfg.get("prefix_bold", False))
+
     units = [("J", days), ("H", hours), ("M", minutes), ("S", seconds)]
 
     svg = [
@@ -71,7 +75,8 @@ def svg_preview(cfg: dict) -> str:
         svg.append(
             f'<text x="{w/2}" y="26" text-anchor="middle" '
             f'font-family="system-ui, -apple-system, sans-serif" '
-            f'font-size="18" font-weight="500" fill="{text_color}">{_esc(prefix)}</text>'
+            f'font-size="18" font-weight="{"bold" if prefix_bold else "normal"}" '
+            f'fill="{text_color}">{_esc(prefix)}</text>'
         )
 
     # ======================
@@ -105,6 +110,8 @@ def svg_preview(cfg: dict) -> str:
         total_width = count * (2 * radius) + (count - 1) * spacing
         start_x = (w - total_width) / 2
 
+        glow_color = _lighten_color(progress_color, factor=0.6)
+
         for i, ((label, val), ratio) in enumerate(zip(units, ratios)):
             cx = start_x + radius + i * (2 * radius + spacing)
             cy = center_y
@@ -116,7 +123,6 @@ def svg_preview(cfg: dict) -> str:
             )
 
             # halo (glow) derrière la progression
-            glow_color = _lighten_color(progress_color, factor=0.6)
             circ = 2 * math.pi * radius
             dash = max(0.0, min(ratio, 1.0)) * circ
 
@@ -142,6 +148,7 @@ def svg_preview(cfg: dict) -> str:
                 f'<text x="{cx}" y="{cy+4}" text-anchor="middle" '
                 f'font-size="{cfg["font_size"]}" '
                 f'font-family="system-ui, -apple-system, sans-serif" '
+                f'font-weight="{"bold" if font_bold else "normal"}" '
                 f'fill="{text_color}" dominant-baseline="middle">{val:02d}</text>'
             )
 
@@ -152,6 +159,7 @@ def svg_preview(cfg: dict) -> str:
                     f'<text x="{cx}" y="{cy + radius + 32}" text-anchor="middle" '
                     f'font-size="{label_size}" '
                     f'font-family="system-ui, -apple-system, sans-serif" '
+                    f'font-weight="{"bold" if label_bold else "normal"}" '
                     f'fill="{label_color}">{lbl}</text>'
                 )
 
@@ -159,7 +167,7 @@ def svg_preview(cfg: dict) -> str:
         return "\n".join(svg)
 
     # ======================
-    # BASIC (inchangé)
+    # BASIC
     # ======================
     main_size = cfg["font_size"]
     label_size = cfg["basic_label_size"]
@@ -191,6 +199,7 @@ def svg_preview(cfg: dict) -> str:
             f'<text x="{num_x}" y="{center_y}" text-anchor="middle" '
             f'font-size="{main_size}" '
             f'font-family="system-ui, -apple-system, sans-serif" '
+            f'font-weight="{"bold" if font_bold else "normal"}" '
             f'fill="{text_color}">{val:02d}</text>'
         )
 
@@ -199,6 +208,7 @@ def svg_preview(cfg: dict) -> str:
                 f'<text x="{num_x}" y="{center_y + main_size + gap}" text-anchor="middle" '
                 f'font-size="{label_size}" '
                 f'font-family="system-ui, -apple-system, sans-serif" '
+                f'font-weight="{"bold" if label_bold else "normal"}" '
                 f'fill="{cfg["basic_label_color"]}">{label}</text>'
             )
 
