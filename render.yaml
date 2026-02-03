@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: ultimate-countdown
+    env: python
+    plan: free
+    autoDeploy: true
+
+    buildCommand: pip install -r requirements.txt
+
+    # Flask via gunicorn (recommandé)
+    # ⚠️ adapte "app:app" si ton objet Flask n'est pas nommé app
+    startCommand: gunicorn app:app
