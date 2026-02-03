@@ -7,6 +7,5 @@ services:
 
     buildCommand: pip install -r requirements.txt
 
-    # Flask via gunicorn (recommandé)
-    # ⚠️ adapte "app:app" si ton objet Flask n'est pas nommé app
+    # Flask via Gunicorn (recommandé sur Render)
     startCommand: gunicorn app:app
