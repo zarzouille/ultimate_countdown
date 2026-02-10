@@ -7,12 +7,18 @@ from flask import Flask, render_template, request, send_file, url_for
 import renderer_svg
 import renderer_gif
 
+# 1) Secret key (sessions, sécurité)
+app.secret_key = os.environ.get("SECRET_KEY", "dev-only-change-me")
+
+# 2) Environnement (dev/prod)
+APP_ENV = os.environ.get("APP_ENV", "development")
+
 # ============================
 # CONFIG GLOBALE
 # ============================
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-CONFIG_DIR = os.path.join(BASE_DIR, "configs")
+CONFIG_DIR = os.environ.get("CONFIG_DIR", os.path.join(BASE_DIR, "configs"))
 os.makedirs(CONFIG_DIR, exist_ok=True)
 
 DEFAULT_CONFIG = {
