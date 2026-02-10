@@ -13,6 +13,16 @@ app.secret_key = os.environ.get("SECRET_KEY", "dev-only-change-me")
 # 2) Environnement (dev/prod)
 APP_ENV = os.environ.get("APP_ENV", "development")
 
+if APP_ENV == "production":
+    app.config.update(
+        DEBUG=False,
+        TESTING=False,
+    )
+else:
+    app.config.update(
+        DEBUG=True,
+        TESTING=True,
+
 # ============================
 # CONFIG GLOBALE
 # ============================
