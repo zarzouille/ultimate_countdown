@@ -1,3 +1,8 @@
+import logging
+
+logging.basicConfig(level=logging.INFO)
+app.logger.info("App démarrée")
+
 import os
 import json
 import uuid
