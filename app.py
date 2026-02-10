@@ -1,16 +1,14 @@
-import logging
-
-logging.basicConfig(level=logging.INFO)
-app.logger.info("App démarrée")
-
 import os
 import json
 import uuid
+import logging
 from datetime import datetime
 from flask import Flask, render_template, request, send_file, url_for
 
 import renderer_svg
 import renderer_gif
+
+logging.basicConfig(level=logging.INFO)
 
 # 1) Secret key (sessions, sécurité)
 app.secret_key = os.environ.get("SECRET_KEY", "dev-only-change-me")
