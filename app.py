@@ -1,3 +1,6 @@
+# ============================
+# IMPORTS
+# ============================
 import os
 import json
 import uuid
@@ -8,13 +11,22 @@ from flask import Flask, render_template, request, send_file, url_for
 import renderer_svg
 import renderer_gif
 
+# ============================
+# LOGGING
+# ============================
 logging.basicConfig(level=logging.INFO)
 
-# 1) Secret key (sessions, sécurité)
-app.secret_key = os.environ.get("SECRET_KEY", "dev-only-change-me")
+# ============================
+# FLASK APP
+# ============================
+app = Flask(__name__)
 
-# 2) Environnement (dev/prod)
+# ============================
+# VARIABLES D’ENV / ENVIRONNEMENT
+# ============================
 APP_ENV = os.environ.get("APP_ENV", "development")
+
+app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "dev-only-change-me")
 
 if APP_ENV == "production":
     app.config.update(
@@ -25,11 +37,13 @@ else:
     app.config.update(
         DEBUG=True,
         TESTING=True,
+    )
+
+app.logger.info(f"Application démarrée en mode {APP_ENV}")
 
 # ============================
-# CONFIG GLOBALE
+# CONFIG GLOBALE PROJET
 # ============================
-
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 CONFIG_DIR = os.environ.get("CONFIG_DIR", os.path.join(BASE_DIR, "configs"))
 os.makedirs(CONFIG_DIR, exist_ok=True)
@@ -37,7 +51,7 @@ os.makedirs(CONFIG_DIR, exist_ok=True)
 DEFAULT_CONFIG = {
     "width": 600,
     "height": 200,
-    "template": "circular",  # "basic" ou "circular"
+    "template": "circular",
 
     # Options communes
     "background_color": "#FFFFFF",
@@ -53,7 +67,7 @@ DEFAULT_CONFIG = {
     "label_bold": False,
     "prefix_bold": False,
 
-    # Template CIRCULAR (Pro)
+    # Template CIRCULAR
     "circular_base_color": "#E0EAFF",
     "circular_progress_color": "#4C6FFF",
     "circular_thickness": 10,
@@ -68,9 +82,6 @@ DEFAULT_CONFIG = {
     "basic_label_size": 12,
     "basic_gap": 4,
 }
-
-app = Flask(__name__)
-
 
 # ============================
 # OUTILS UTILITAIRES
